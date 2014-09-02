@@ -13,7 +13,6 @@ function ActivityEditor:__init(callback)
 	self.window:SetPositionRel(Vector2(0.5, 0.5) - self.window:GetSizeRel() / 2)
 	self.window:SetTitle("Create a group activity")
 	self.window:Subscribe("WindowClosed", self, self.OnWindowClosed)
-
 	
 	self.nameBox = LabeledTextBox.Create(self.window)
 	self.nameBox:SetLabel("Name")
