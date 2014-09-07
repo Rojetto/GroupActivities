@@ -38,11 +38,19 @@ function Activity:PlayerQuit(player)
 end
 
 function Activity:IsVehicleAllowed(vehicleId)
-	return allowedVehicles[vehicleId] ~= nil
+	return self.allowedVehicles[vehicleId] ~= nil
 end
 
 function Activity:IsPlayerInActivity(player)
-	return members[player] ~= nil
+	return self.members[player] ~= nil or self.leader == player
+end
+
+function Activity:IsPlayerBanned(player)
+	return self.bannedSteamIds[player:GetSteamId()] ~= nil
+end
+
+function Activity:IsPlayerWhitelisted(player)
+	return self.whitelistedSteamIds[player:GetSteamId()] ~= nil
 end
 
 function Activity:ToTable()

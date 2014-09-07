@@ -12,7 +12,7 @@ function ActivityEditor:__init(callback)
 	self.window:SetHeight(380)
 	self.window:SetPositionRel(Vector2(0.5, 0.5) - self.window:GetSizeRel() / 2)
 	self.window:SetTitle("Create a group activity")
-	self.window:Subscribe("WindowClosed", self, self.OnWindowClosed)
+	self.window:Subscribe("WindowClosed", self, self.Close)
 	
 	self.nameBox = LabeledTextBox.Create(self.window)
 	self.nameBox:SetLabel("Name")
@@ -80,10 +80,11 @@ function ActivityEditor:__init(callback)
 	self.saveButton:SetText("Save")
 	self.saveButton:SetEnabled(false)
 	self.saveButton:Subscribe("Press", self, self.OnSaveButtonClick)
+	self.saveButton:SetToolTip("Activity name and/or password missing")
 
 	self.window:Show()
 
-	Events:Subscribe("LocalPlayerInput", self, self.OnLocalPlayerInput)
+	self.inputEvent = Events:Subscribe("LocalPlayerInput", self, self.OnLocalPlayerInput)
 end
 
 function ActivityEditor:SetActivity(activity)
@@ -100,15 +101,13 @@ function ActivityEditor:OnLocalPlayerInput()
 	return not self.active
 end
 
-function ActivityEditor:OnWindowClosed()
-	self.active = false
-end
-
 function ActivityEditor:OnFormChanged(box)
 	if self.nameBox:GetText() ~= "" and ((self.accessBox:GetSelectedItem():GetText() == Access.Password and self.passwordBox:GetText() ~= "") or self.accessBox:GetSelectedItem():GetText() ~= Access.Password) then
 		self.saveButton:SetEnabled(true)
+		self.saveButton:SetToolTip("Save your new activity")
 	else
 		self.saveButton:SetEnabled(false)
+		self.saveButton:SetToolTip("Activity name and/or password missing")
 	end
 end
 
@@ -131,8 +130,13 @@ function ActivityEditor:OnSaveButtonClick()
 	self.activity.access = self.accessBox:GetSelectedItem():GetText()
 	self.activity.password = self.passwordBox:GetText()
 
+	self.callback(self.activity)
+
+	self:Close()
+end
+
+function ActivityEditor:Close()
 	self.active = false
 	self.window:Hide()
-
-	self.callback(self.activity)
+	Events:Unsubscribe(self.inputEvent)
 end

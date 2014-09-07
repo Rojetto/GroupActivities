@@ -38,8 +38,8 @@ Network:Subscribe("ActivityCreated", OnActivityCreated)
 
 function OnPlayerQuit(args)
 	for _, value in pairs(activities) do
-		if value:IsPlayerInActivity(args.player:GetId()) then
-			value:PlayerQuit(args.player:GetId())
+		if value:IsPlayerInActivity(args.player) then
+			value:PlayerQuit(args.player)
 		end
 	end
 
@@ -49,14 +49,14 @@ end
 Events:Subscribe("PlayerQuit", OnPlayerQuit)
 
 function OnActivityLeft(args)
-	activities[args.activityId]:PlayerQuit(args.playerId)
+	activities[args.activityId]:PlayerQuit(args.player)
 	RemoveInactiveActivities()
 	BroadcastActivities()
 end
 Network:Subscribe("ActivityLeft", OnActivityLeft)
 
 function OnActivityJoined(args)
-	activities[args.activityId]:PlayerJoin(args.playerId)
+	activities[args.activityId]:PlayerJoin(args.player)
 	BroadcastActivities()
 end
 Network:Subscribe("ActivityJoined", OnActivityJoined)
