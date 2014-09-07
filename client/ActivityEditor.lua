@@ -1,18 +1,15 @@
-class("ActivityEditor")
+class("ActivityEditor")(ActiveWindow)
 
 function ActivityEditor:__init(callback)
+	ActiveWindow.__init(self)
+
 	self.callback = callback
-
-	self.active = true
-
 	self.activity = Activity(-1, "", LocalPlayer)
 
-	self.window = Window.Create()
 	self.window:SetWidthRel(0.2)
-	self.window:SetHeight(380)
+	self.window:SetHeight(400)
 	self.window:SetPositionRel(Vector2(0.5, 0.5) - self.window:GetSizeRel() / 2)
 	self.window:SetTitle("Create a group activity")
-	self.window:Subscribe("WindowClosed", self, self.Close)
 	
 	self.nameBox = LabeledTextBox.Create(self.window)
 	self.nameBox:SetLabel("Name")
@@ -61,17 +58,27 @@ function ActivityEditor:__init(callback)
 	self.vehicleButton:SetPosition(Vector2(0, 210))
 	self.vehicleButton:SetText("Edit allowed vehicles")
 
-	self.promoteButton = Button.Create(self.window)
-	self.promoteButton:SetWidthAutoRel(1.0)
-	self.promoteButton:SetHeight(25)
-	self.promoteButton:SetPosition(Vector2(0, 240))
-	self.promoteButton:SetText("Promote player to leader")
-
 	self.banButton = Button.Create(self.window)
 	self.banButton:SetWidthAutoRel(1.0)
 	self.banButton:SetHeight(25)
-	self.banButton:SetPosition(Vector2(0, 270))
+	self.banButton:SetPosition(Vector2(0, 240))
 	self.banButton:SetText("Ban/Unban players")
+
+	self.promoteButton = Button.Create(self.window)
+	self.promoteButton:SetWidthAutoRel(1.0)
+	self.promoteButton:SetHeight(25)
+	self.promoteButton:SetPosition(Vector2(0, 270))
+	self.promoteButton:SetText("Promote player to leader")
+	self.promoteButton:Subscribe("Press", self, self.OnPromoteButtonClick)
+	self.promoteButton:Hide()
+	self.promoteEvent = Events:Subscribe("PlayerPromoted", self, self.OnPlayerPromoted)
+
+	self.deleteButton = Button.Create(self.window)
+	self.deleteButton:SetWidthAutoRel(1.0)
+	self.deleteButton:SetHeight(25)
+	self.deleteButton:SetPosition(Vector2(0, 300))
+	self.deleteButton:SetText("Delete this activity")
+	self.deleteButton:Hide()
 
 	self.saveButton = Button.Create(self.window)
 	self.saveButton:SetWidthAutoRel(1.0)
@@ -81,24 +88,17 @@ function ActivityEditor:__init(callback)
 	self.saveButton:SetEnabled(false)
 	self.saveButton:Subscribe("Press", self, self.OnSaveButtonClick)
 	self.saveButton:SetToolTip("Activity name and/or password missing")
-
-	self.window:Show()
-
-	self.inputEvent = Events:Subscribe("LocalPlayerInput", self, self.OnLocalPlayerInput)
 end
 
 function ActivityEditor:SetActivity(activity)
 	self.window:SetTitle("Edit group activity")
 	self.activity = activity
+	self.promoteButton:Show()
+	self.deleteButton:Show()
 	self.nameBox:SetText(activity.name)
 	self.descriptionBox:SetText(activity.description)
 	self.accessBox:SelectItemByName(activity.access)
 	self.passwordBox:SetText(activity.password)
-end
-
-function ActivityEditor:OnLocalPlayerInput()
-	Mouse:SetVisible(self.active)
-	return not self.active
 end
 
 function ActivityEditor:OnFormChanged(box)
@@ -124,6 +124,25 @@ function ActivityEditor:OnAccessBoxSelection(box)
 	end
 end
 
+function ActivityEditor:OnPromoteButtonClick()
+	if self.promoteWindow == nil or not self.promoteWindow.active then
+		self.promoteWindow = PlayerSelector()
+		self.promoteWindow.window:SetTitle("Select a player to promote")
+	end
+end
+
+function ActivityEditor:OnPlayerPromoted(player)
+	print(player:GetName().." is being promoted")
+end
+
+function ActivityEditor:Close()
+	if self.active then
+		Events:Unsubscribe(self.promoteEvent)
+	end
+	if self.promoteWindow ~= nil then self.promoteWindow:Close() end
+	ActiveWindow.Close(self)
+end
+
 function ActivityEditor:OnSaveButtonClick()
 	self.activity.name = self.nameBox:GetText()
 	self.activity.description = self.descriptionBox:GetText()
@@ -133,10 +152,4 @@ function ActivityEditor:OnSaveButtonClick()
 	self.callback(self.activity)
 
 	self:Close()
-end
-
-function ActivityEditor:Close()
-	self.active = false
-	self.window:Hide()
-	Events:Unsubscribe(self.inputEvent)
 end

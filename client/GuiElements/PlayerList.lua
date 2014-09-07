@@ -1,17 +1,13 @@
-class("PlayerList")(BaseWindow)
+class("PlayerList")(SortedList)
 
 function PlayerList.Create(baseWindow)
-	local self = BaseWindow.Create(baseWindow)
+	local self = SortedList.Create(baseWindow)
 
 	self.SetPlayers = PlayerList.SetPlayers
-	self.SetMultiSelect = PlayerList.SetMultiSelect
-	self.GetMultiSelect = PlayerList.GetMultiSelect
 	self.GetSelectedPlayer = PlayerList.GetSelectedPlayer
 
-	self.sortedList = SortedList.Create(self)
-	self.sortedList:SetDock(GwenPosition.Fill)
-	self.sortedList:AddColumn("Id", 64)
-	self.sortedList:AddColumn("Name")
+	self:AddColumn("Id", 64)
+	self:AddColumn("Name")
 
 	self.players = {}
 
@@ -28,23 +24,15 @@ end
 function PlayerList:SetPlayers(players)
 	self.players = players
 
-	self.sortedList:Clear()
+	self:Clear()
 	for player, _ in pairs(players) do
-		local row = self.sortedList:AddItem(tostring(player:GetId()))
+		local row = self:AddItem(tostring(player:GetId()))
 		row:SetCellText(1, player:GetName())
 	end
 end
 
-function PlayerList:SetMultiSelect(multiSelect)
-	self.sortedList:SetMultiSelect(multiSelect)
-end
-
-function PlayerList:GetMultiSelect()
-	return self.sortedList:GetMultiSelect()
-end
-
 function PlayerList:GetSelectedPlayer()
-	local row = self.sortedList:GetSelectedRow()
+	local row = self:GetSelectedRow()
 	for player, _ in pairs(self.players) do
 		if player:GetId() == tonumber(row:GetCellText(0)) then
 			return player
