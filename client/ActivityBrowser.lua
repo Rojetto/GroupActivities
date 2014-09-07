@@ -13,50 +13,76 @@ function ActivityBrowser:__init()
 	self.browserBase:SetDock(GwenPosition.Fill)
 	self.browserBase:SetSizeAutoRel(Vector2(1.0, 1.0))
 
-	self.bottomBase = BaseWindow.Create(self.window)
-	self.bottomBase:SetDock(GwenPosition.Bottom)
-	self.bottomBase:SetHeight(25)
-	self.bottomBase:SetWidthAutoRel(1.0)
-
 	self.activityList = SortedList.Create(self.browserBase)
 	self.activityList:SetDock(GwenPosition.Left)
 	self.activityList:SetWidthAutoRel(0.7)
-	self.activityList:AddColumn("Id")
+	self.activityList:SetPadding(Vector2(0, 0), Vector2(0, 5))
+	self.activityList:AddColumn("Id", 64)
 	self.activityList:AddColumn("Name")
 	self.activityList:AddColumn("Leader")
-	self.activityList:AddColumn("Access")
-	self.activityList:AddColumn("Players")
+	self.activityList:AddColumn("Access", 128)
+	self.activityList:AddColumn("Players", 64)
 	self.activityList:Subscribe("RowSelected", self, self.OnRowSelected)
 
 	self.details = BaseWindow.Create(self.browserBase)
 	self.details:SetWidthAutoRel(0.3)
 	self.details:SetDock(GwenPosition.Right)
+	self.details:SetPadding(Vector2(5, 0), Vector2(0, 5))
 
-	self.descriptionScrollControl = ScrollControl.Create(self.details)
+	self.detailsGroup = GroupBox.Create(self.details)
+	self.detailsGroup:SetDock(GwenPosition.Fill)
+
+	self.nameLabel = Label.Create(self.detailsGroup)
+	self.nameLabel:SetHeight(25)
+	self.nameLabel:SetWidthAutoRel(1.0)
+
+	self.leaderLabel = Label.Create(self.detailsGroup)
+	self.leaderLabel:SetHeight(25)
+	self.leaderLabel:SetWidthAutoRel(1.0)
+	self.leaderLabel:SetPosition(Vector2(0, 30))
+
+	self.accessLabel = Label.Create(self.detailsGroup)
+	self.accessLabel:SetHeight(25)
+	self.accessLabel:SetWidthAutoRel(1.0)
+	self.accessLabel:SetPosition(Vector2(0, 60))
+
+	self.playersLabel = Label.Create(self.detailsGroup)
+	self.playersLabel:SetHeight(25)
+	self.playersLabel:SetWidthAutoRel(1.0)
+	self.playersLabel:SetPosition(Vector2(0, 90))
+
+	self.descriptionScrollControl = ScrollControl.Create(self.detailsGroup)
 	self.descriptionScrollControl:SetWidthAutoRel(1.0)
 	self.descriptionScrollControl:SetHeight(100)
+	self.descriptionScrollControl:SetPosition(Vector2(0, 120))
 
 	self.descriptionBox = TextBoxMultiline.Create(self.descriptionScrollControl)
 	self.descriptionBox:SetEnabled(false)
 	self.descriptionBox:SetHeight(100)
 	self.descriptionBox:SetWidthAutoRel(0.95)
 
+	self.playerList = PlayerList.Create(self.detailsGroup)
+	self.playerList:SetHeight(100)
+	self.playerList:SetWidthAutoRel(1.0)
+	self.playerList:SetPosition(Vector2(0, 225))
+
 	self.joinLeaveButton = Button.Create(self.details)
-	self.joinLeaveButton:SetText("Join")
-	self.joinLeaveButton:SetToolTip("You need to select an activity")
-	self.joinLeaveButton:SetEnabled(false)
 	self.joinLeaveButton:SetDock(GwenPosition.Bottom)
 	self.joinLeaveButton:SetHeight(25)
 	self.joinLeaveButton:Subscribe("Press", self, self.OnJoinLeaveButtonClicked)
 
-	self.createEditButton = Button.Create(self.bottomBase)
-	self.createEditButton:SetSizeAutoRel(Vector2(1.0, 1.0))
+	self.createEditButton = Button.Create(self.window)
+	self.createEditButton:SetDock(GwenPosition.Bottom)
+	self.createEditButton:SetWidthAutoRel(1.0)
+	self.createEditButton:SetHeight(25)
 	self.createEditButton:SetText("Create activity")
 	self.createEditButton:Subscribe("Press", self, self.OnCreateEditButtonClicked)
 
 	self.activities = {}
 
 	Events:Subscribe("LocalPlayerInput", self, self.OnLocalPlayerInput)
+
+	self:ShowDetails(nil)
 end
 
 function ActivityBrowser:SetActivities(activityList)
@@ -108,7 +134,12 @@ end
 
 function ActivityBrowser:SetActive(active)
 	self.active = active
-	if active then self.window:Show() else self.window:Hide() end
+	if active then
+		self.window:Show()
+	else
+		self.window:Hide()
+		if self.editor ~= nil then self.editor:Close() end
+	end
 end
 
 function ActivityBrowser:OnRowSelected()
@@ -117,14 +148,24 @@ function ActivityBrowser:OnRowSelected()
 end
 
 function ActivityBrowser:ShowDetails(activity)
+	self.nameLabel:SetText("Name: ")
+	self.leaderLabel:SetText("Leader: ")
+	self.accessLabel:SetText("Access: ")
+	self.playersLabel:SetText("Players: ")
 	self.descriptionBox:SetText("No description")
 	self.descriptionBox:SetHeight(100)
+	self.playerList:SetPlayers({})
 
 	self.joinLeaveButton:SetText("Join")
 	self.joinLeaveButton:SetToolTip("You need to select an activity")
 	self.joinLeaveButton:SetEnabled(false)
 
 	if activity ~= nil then
+		self.nameLabel:SetText("Name: "..activity.name)
+		self.leaderLabel:SetText("Leader: "..activity.leader:GetName())
+		self.accessLabel:SetText("Access: "..activity.access)
+		self.playersLabel:SetText("Players: "..(#(activity.members) + 1))
+
 		if activity.description ~= "" then
 			self.descriptionBox:SetText(activity.description)
 			self.descriptionBox:SizeToContents()
@@ -133,6 +174,8 @@ function ActivityBrowser:ShowDetails(activity)
 			end
 			self.descriptionBox:SetWidthAutoRel(0.95)
 		end
+
+		self.playerList:SetPlayers(activity.members)
 
 		if GetJoinedActivity() == nil or GetJoinedActivity().id ~= activity.id then
 			if activity.access == Access.Whitelist and not activity:IsPlayerWhitelisted(LocalPlayer) then
@@ -155,9 +198,11 @@ function ActivityBrowser:ShowDetails(activity)
 end
 
 function ActivityBrowser:OnCreateEditButtonClicked()
-	local editor = ActivityEditor(OnActivityCreated)
-	if GetJoinedActivity() ~= nil and GetJoinedActivity().leader == LocalPlayer then
-		editor:SetActivity(GetJoinedActivity())
+	if self.editor == nil or not self.editor.active then
+		self.editor = ActivityEditor(OnActivityCreated)
+		if GetJoinedActivity() ~= nil and GetJoinedActivity().leader == LocalPlayer then
+			self.editor:SetActivity(GetJoinedActivity())
+		end
 	end
 end
 
