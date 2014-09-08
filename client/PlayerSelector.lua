@@ -1,7 +1,10 @@
 class("PlayerSelector")(ActiveWindow)
 
-function PlayerSelector:__init()
+function PlayerSelector:__init(callbackObject, callbackFunction)
 	ActiveWindow.__init(self)
+
+	self.callbackObject = callbackObject
+	self.callbackFunction = callbackFunction
 
 	self.window:SetSize(Vector2(300, 600))
 	self.window:SetPositionRel(Vector2(0.5, 0.5) - self.window:GetSizeRel() / 2)
@@ -26,6 +29,7 @@ function PlayerSelector:OnRowSelected()
 end
 
 function PlayerSelector:OnFinishButtonClick()
-	Events:Fire("PlayerSelected", self.playerList:GetSelectedPlayer())
+	self.callbackFunction(self.callbackObject, self.playerList:GetSelectedPlayer())
+
 	self:Close()
 end

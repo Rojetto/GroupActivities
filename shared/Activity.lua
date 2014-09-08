@@ -69,6 +69,30 @@ function Activity:IsPlayerWhitelisted(player)
 	return self.whitelistedSteamIds[player:GetSteamId()] == true
 end
 
+function Activity:GetWhitelistedPlayers()
+	local whitelist = {}
+
+	for player in Client:GetPlayers() do
+		if self.whitelistedSteamIds[player:GetSteamId()] == true then
+			whitelist[player] = true
+		end
+	end
+
+	return whitelist
+end
+
+function Activity:GetBannedPlayers()
+	local bannedPlayers = {}
+
+	for player in Client:GetPlayers() do
+		if self.bannedSteamIds[player:GetSteamId()] == true then
+			bannedPlayers[player] = true
+		end
+	end
+
+	return bannedPlayers
+end
+
 function Activity:ToTable()
 	local t = {}
 

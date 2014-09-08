@@ -51,6 +51,7 @@ function ActivityEditor:__init()
 	self.whitelistButton:SetPosition(Vector2(0, 25))
 	self.whitelistButton:SetText("Edit whitelist")
 	self.whitelistButton:SetVisible(false)
+	self.whitelistButton:Subscribe("Press", self, self.OnWhitelistButtonClick)
 
 	self.vehicleButton = Button.Create(self.window)
 	self.vehicleButton:SetWidthAutoRel(1.0)
@@ -62,7 +63,7 @@ function ActivityEditor:__init()
 	self.banButton:SetWidthAutoRel(1.0)
 	self.banButton:SetHeight(25)
 	self.banButton:SetPosition(Vector2(0, 240))
-	self.banButton:SetText("Ban/Unban players")
+	self.banButton:SetText("Edit banned players")
 
 	self.onLeaveBase = BaseWindow.Create(self.window)
 	self.onLeaveBase:SetPosition(Vector2(0, 270))
@@ -79,8 +80,8 @@ function ActivityEditor:__init()
 	self.onLeaveBox:SetDock(GwenPosition.Right)
 	self.onLeaveBox:SetSizeAutoRel(Vector2(0.5, 1.0))
 	self.onLeaveBox:SetAlignment(GwenPosition.CenterV)
-	self.onLeaveBox:AddItem(OnLeaveAction.Promote, OnLeaveAction.Promote)
 	self.onLeaveBox:AddItem(OnLeaveAction.Delete, OnLeaveAction.Delete)
+	self.onLeaveBox:AddItem(OnLeaveAction.Promote, OnLeaveAction.Promote)
 
 	self.promoteButton = Button.Create(self.window)
 	self.promoteButton:SetWidthAutoRel(1.0)
@@ -89,7 +90,6 @@ function ActivityEditor:__init()
 	self.promoteButton:SetText("Promote player to leader")
 	self.promoteButton:Subscribe("Press", self, self.OnPromoteButtonClick)
 	self.promoteButton:Hide()
-	self.promoteEvent = Events:Subscribe("PlayerSelected", self, self.OnPlayerPromoted)
 
 	self.deleteButton = Button.Create(self.window)
 	self.deleteButton:SetWidthAutoRel(1.0)
@@ -144,17 +144,20 @@ function ActivityEditor:OnAccessBoxSelection(box)
 	end
 end
 
-function ActivityEditor:OnPromoteButtonClick()
-	if self.promoteWindow == nil or not self.promoteWindow.active then
-		self.promoteWindow = PlayerSelector()
-		self.promoteWindow.window:SetTitle("Select player from this activity to promote")
-		self.promoteWindow.playerList:SetPlayers(self.activity.members)
+function ActivityEditor:OnWhitelistButtonClick()
+	if self.whitelistWindow == nil or not self.whitelistWindow.active then
+		self.whitelistWindow = PlayerListEditor(self, self.OnWhitelistSaved)
+		self.whitelistWindow.window:SetTitle("Edit whitelist")
+		self.whitelistWindow.playerList:SetPlayers(self.activity:GetWhitelistedPlayers())
 	end
 end
 
-function ActivityEditor:OnPlayerPromoted(player)
-	GroupActivitiesClient:PromotePlayer(self.activity, player)
-	self:Close()
+function ActivityEditor:OnPromoteButtonClick()
+	if self.promoteWindow == nil or not self.promoteWindow.active then
+		self.promoteWindow = PlayerSelector(self, self.OnPlayerPromoted)
+		self.promoteWindow.window:SetTitle("Select player from this activity to promote")
+		self.promoteWindow.playerList:SetPlayers(self.activity.members)
+	end
 end
 
 function ActivityEditor:OnDeleteButtonClick()
@@ -175,10 +178,17 @@ function ActivityEditor:OnSaveButtonClick()
 	self:Close()
 end
 
+function ActivityEditor:OnWhitelistSaved(whitelist)
+
+end
+
+function ActivityEditor:OnPlayerPromoted(player)
+	GroupActivitiesClient:PromotePlayer(self.activity, player)
+	self:Close()
+end
+
 function ActivityEditor:Close()
-	if self.active then
-		Events:Unsubscribe(self.promoteEvent)
-	end
 	if self.promoteWindow ~= nil then self.promoteWindow:Close() end
+	if self.whitelistWindow ~= nil then self.whitelistWindow:Close() end
 	ActiveWindow.Close(self)
 end
