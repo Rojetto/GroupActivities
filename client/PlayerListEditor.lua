@@ -1,8 +1,9 @@
 class("PlayerListEditor")(ActiveWindow)
 
-function PlayerListEditor:__init(callbackObject, callbackFunction)
+function PlayerListEditor:__init(originalList, callbackObject, callbackFunction)
 	ActiveWindow.__init(self)
 
+	self.originalList = originalList
 	self.callbackObject = callbackObject
 	self.callbackFunction = callbackFunction
 
@@ -42,6 +43,10 @@ function PlayerListEditor:__init(callbackObject, callbackFunction)
 	self.finishButton:SetHeight(25)
 	self.finishButton:SetText("Save")
 	self.finishButton:Subscribe("Press", self, self.OnFinishButtonClick)
+
+	local listCopy = {}
+	for key, value in pairs(self.originalList) do listCopy[key] = value end
+	self.playerList:SetPlayers(listCopy)
 end
 
 function PlayerListEditor:OnRowSelected()
@@ -63,8 +68,32 @@ function PlayerListEditor:OnRemoveButtonClick()
 	end
 end
 
+function PlayerListEditor:GetAddedPlayers()
+	local addedPlayers = {}
+
+	for player, _ in pairs(self.playerList.players) do
+		if self.originalList[player] == nil then
+			addedPlayers[player] = true
+		end
+	end
+
+	return addedPlayers
+end
+
+function PlayerListEditor:GetRemovedPlayers()
+	local removedPlayers = {}
+
+	for player, _ in pairs(self.originalList) do
+		if self.playerList.players[player] == nil then
+			removedPlayers[player] = true
+		end
+	end
+
+	return removedPlayers
+end
+
 function PlayerListEditor:OnFinishButtonClick()
-	self.callbackFunction(self.callbackObject, self.playerList.players)
+	self.callbackFunction(self.callbackObject, self.playerList.players, self:GetAddedPlayers(), self:GetRemovedPlayers())
 
 	self:Close()
 end

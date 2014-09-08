@@ -9,6 +9,16 @@ function GroupActivitiesClient:__init()
 	Events:Subscribe("LocalPlayerChat", self, self.OnChat)
 end
 
+function GroupActivitiesClient:SteamIdToPlayer(steamId)
+	if steamId == LocalPlayer:GetSteamId().id then return LocalPlayer end
+
+	for player in Client:GetPlayers() do
+		if steamId == player:GetSteamId().id then
+			return player
+		end
+	end
+end
+
 function GroupActivitiesClient:OnActivityListReceived(activityList)
 	self.activities = {}
 

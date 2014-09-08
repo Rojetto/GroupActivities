@@ -62,35 +62,87 @@ function Activity:IsPlayerInActivity(player)
 end
 
 function Activity:IsPlayerBanned(player)
-	return self.bannedSteamIds[player:GetSteamId()] == true
+	return self.bannedSteamIds[player:GetSteamId().id] == true
 end
 
 function Activity:IsPlayerWhitelisted(player)
-	return self.whitelistedSteamIds[player:GetSteamId()] == true
+	return self.whitelistedSteamIds[player:GetSteamId().id] == true
 end
 
 function Activity:GetWhitelistedPlayers()
 	local whitelist = {}
 
-	for player in Client:GetPlayers() do
-		if self.whitelistedSteamIds[player:GetSteamId()] == true then
-			whitelist[player] = true
-		end
+	for steamId, _ in pairs(self.whitelistedSteamIds) do
+		local player = GroupActivitiesClient:SteamIdToPlayer(steamId)
+		if player ~= nil then whitelist[player] = true end
 	end
 
 	return whitelist
 end
 
 function Activity:GetBannedPlayers()
-	local bannedPlayers = {}
+	local banlist = {}
 
-	for player in Client:GetPlayers() do
-		if self.bannedSteamIds[player:GetSteamId()] == true then
-			bannedPlayers[player] = true
-		end
+	for steamId, _ in pairs(self.bannedSteamIds) do
+		local player = GroupActivitiesClient:SteamIdToPlayer(steamId)
+		if player ~= nil then banlist[player] = true end
 	end
 
-	return bannedPlayers
+	return banlist
+end
+
+function Activity:AddWhitelistedPlayer(player)
+	self.whitelistedSteamIds[player:GetSteamId().id] = true
+	self.bannedSteamIds[player:GetSteamId().id] = nil
+end
+
+function Activity:RemoveWhitelistedPlayer(player)
+	self.whitelistedSteamIds[player:GetSteamId().id] = nil
+end
+
+function Activity:AddWhitelistedPlayers(addedPlayers)
+	for player, _ in pairs(addedPlayers) do
+		self:AddWhitelistedPlayer(player)
+	end
+end
+
+function Activity:RemoveWhitelistedPlayers(removedPlayers)
+	for player, _ in pairs(removedPlayers) do
+		self:RemoveWhitelistedPlayer(player)
+	end
+end
+
+function Activity:SetWhitelistedPlayers(whitelist)
+	self.whitelistedSteamIds = {}
+
+	self:AddWhitelistedPlayers(whitelist)
+end
+
+function Activity:AddBannedPlayer(player)
+	self.bannedSteamIds[player:GetSteamId().id] = true
+	self.whitelistedSteamIds[player:GetSteamId().id] = nil
+end
+
+function Activity:RemoveBannedPlayer(player)
+	self.bannedSteamIds[player:GetSteamId().id] = nil
+end
+
+function Activity:AddBannedPlayers(addedPlayers)
+	for player, _ in pairs(addedPlayers) do
+		self:AddBannedPlayer(player)
+	end
+end
+
+function Activity:RemoveBannedPlayers(removedPlayers)
+	for player, _ in pairs(removedPlayers) do
+		self:RemoveBannedPlayer(player)
+	end
+end
+
+function Activity:SetBannedPlayers(banlist)
+	self.bannedSteamIds = {}
+
+	self:AddBannedPlayers(banlist)
 end
 
 function Activity:ToTable()

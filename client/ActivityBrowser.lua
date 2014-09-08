@@ -207,7 +207,7 @@ function ActivityBrowser:OnCreateEditButtonClicked()
 end
 
 function ActivityBrowser:OnJoinLeaveButtonClicked()
-	if GetJoinedActivity() == self:GetSelectedActivity() then
+	if GroupActivitiesClient:GetJoinedActivity() == self:GetSelectedActivity() then
 		GroupActivitiesClient:LeaveActivity(self:GetSelectedActivity())
 	else
 		GroupActivitiesClient:JoinActivity(self:GetSelectedActivity())

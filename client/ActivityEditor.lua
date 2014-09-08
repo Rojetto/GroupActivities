@@ -64,6 +64,7 @@ function ActivityEditor:__init()
 	self.banButton:SetHeight(25)
 	self.banButton:SetPosition(Vector2(0, 240))
 	self.banButton:SetText("Edit banned players")
+	self.banButton:Subscribe("Press", self, self.OnBanButtonClick)
 
 	self.onLeaveBase = BaseWindow.Create(self.window)
 	self.onLeaveBase:SetPosition(Vector2(0, 270))
@@ -146,9 +147,15 @@ end
 
 function ActivityEditor:OnWhitelistButtonClick()
 	if self.whitelistWindow == nil or not self.whitelistWindow.active then
-		self.whitelistWindow = PlayerListEditor(self, self.OnWhitelistSaved)
+		self.whitelistWindow = PlayerListEditor(self.activity:GetWhitelistedPlayers(), self, self.OnWhitelistSaved)
 		self.whitelistWindow.window:SetTitle("Edit whitelist")
-		self.whitelistWindow.playerList:SetPlayers(self.activity:GetWhitelistedPlayers())
+	end
+end
+
+function ActivityEditor:OnBanButtonClick()
+	if self.banWindow == nil or not self.banWindow.active then
+		self.banWindow = PlayerListEditor(self.activity:GetBannedPlayers(), self, self.OnBanlistSaved)
+		self.banWindow.window:SetTitle("Edit banned players")
 	end
 end
 
@@ -173,13 +180,21 @@ function ActivityEditor:OnSaveButtonClick()
 	self.activity.password = self.passwordBox:GetText()
 	self.activity.onLeaveAction = self.onLeaveBox:GetSelectedItem():GetText()
 
+	if self.activity.access == Access.Whitelist then self.activity:AddWhitelistedPlayer(LocalPlayer) end
+
 	GroupActivitiesClient:SaveActivity(self.activity)
 
 	self:Close()
 end
 
-function ActivityEditor:OnWhitelistSaved(whitelist)
+function ActivityEditor:OnWhitelistSaved(whitelist, addedPlayers, removedPlayers)
+	self.activity:AddWhitelistedPlayers(addedPlayers)
+	self.activity:RemoveWhitelistedPlayers(removedPlayers)
+end
 
+function ActivityEditor:OnBanlistSaved(banlist, addedPlayers, removedPlayers)
+	self.activity:AddBannedPlayers(addedPlayers)
+	self.activity:RemoveBannedPlayers(removedPlayers)
 end
 
 function ActivityEditor:OnPlayerPromoted(player)

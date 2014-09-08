@@ -11,6 +11,14 @@ function GroupActivitiesServer:__init()
 	Network:Subscribe("ActivityDeleted", self, self.OnActivityDeleted)
 end
 
+function GroupActivitiesServer:SteamIdToPlayer(steamId)
+	for player in Server:GetPlayers() do
+		if steamId == player:GetSteamId() then
+			return player
+		end
+	end
+end
+
 function GroupActivitiesServer:OnClientModuleLoad(newPlayer)
 	self:BroadcastActivities()
 end
