@@ -12,11 +12,6 @@ function OnActivityListReceived(activityList)
 end
 Network:Subscribe("ActivityList", OnActivityListReceived)
 
-function OnActivitySaved(args)
-	Network:Send("ActivityCreated", args.activity)
-end
-Events:Subscribe("ActivitySaved", OnActivitySaved)
-
 function OnChat(args)
 	if args.text == "/activities" then
 		ShowBrowser()
@@ -35,8 +30,7 @@ Events:Subscribe("KeyUp", OnKey)
 
 function GetJoinedActivity()
 	for id, activity in pairs(activities) do
-		local isPlayerInActivity = activity:IsPlayerInActivity(LocalPlayer)
-		if isPlayerInActivity then
+		if activity:IsPlayerInActivity(LocalPlayer) then
 			return activity
 		end
 	end
@@ -57,4 +51,16 @@ end
 
 function LeaveActivity(activity)
 	Network:Send("ActivityLeft", {activityId = activity.id, player = LocalPlayer})
+end
+
+function PromotePlayer(activity, player)
+	Network:Send("PlayerPromoted", {activityId = activity.id, player = player})
+end
+
+function SaveActivity(activity)
+	Network:Send("ActivitySaved", activity:ToTable())
+end
+
+function DeleteActivity(activity)
+	Network:Send("ActivityDeleted", {activityId = activity.id})
 end

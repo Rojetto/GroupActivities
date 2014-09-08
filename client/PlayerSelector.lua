@@ -9,6 +9,7 @@ function PlayerSelector:__init()
 
 	self.playerList = PlayerList.Create(self.window)
 	self.playerList:SetDock(GwenPosition.Fill)
+	self.playerList:SetPadding(Vector2(0, 0), Vector2(0, 5))
 	self.playerList:Subscribe("RowSelected", self, self.OnRowSelected)
 
 	self.finishButton = Button.Create(self.window)

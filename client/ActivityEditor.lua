@@ -96,6 +96,7 @@ function ActivityEditor:__init()
 	self.deleteButton:SetHeight(25)
 	self.deleteButton:SetPosition(Vector2(0, 330))
 	self.deleteButton:SetText("Delete this activity")
+	self.deleteButton:Subscribe("Press", self, self.OnDeleteButtonClick)
 	self.deleteButton:Hide()
 
 	self.saveButton = Button.Create(self.window)
@@ -146,12 +147,14 @@ end
 function ActivityEditor:OnPromoteButtonClick()
 	if self.promoteWindow == nil or not self.promoteWindow.active then
 		self.promoteWindow = PlayerSelector()
-		self.promoteWindow.window:SetTitle("Select a player to promote")
+		self.promoteWindow.window:SetTitle("Select player from this activity to promote")
+		self.promoteWindow.playerList:SetPlayers(self.members)
 	end
 end
 
 function ActivityEditor:OnPlayerPromoted(player)
-	
+	PromotePlayer(self.activity, player)
+	self:Close()
 end
 
 function ActivityEditor:Close()
@@ -169,7 +172,13 @@ function ActivityEditor:OnSaveButtonClick()
 	self.activity.password = self.passwordBox:GetText()
 	self.activity.onLeaveAction = self.onLeaveBox:GetSelectedItem():GetText()
 
-	Events:Fire("ActivitySaved", {activity = self.activity:ToTable()})
+	SaveActivity(self.activity)
+
+	self:Close()
+end
+
+function ActivityEditor:OnDeleteButtonClick()
+	DeleteActivity(self.activity)
 
 	self:Close()
 end

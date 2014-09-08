@@ -45,20 +45,28 @@ function Activity:PlayerQuit(player)
 	end
 end
 
+function Activity:PromotePlayer(player)
+	if self.members[player] == true then
+		self.members[self.leader] = true
+		self.members[player] = nil
+		self.leader = player
+	end
+end
+
 function Activity:IsVehicleAllowed(vehicleId)
-	return self.allowedVehicles[vehicleId] ~= nil
+	return self.allowedVehicles[vehicleId] == true
 end
 
 function Activity:IsPlayerInActivity(player)
-	return self.members[player] ~= nil or self.leader == player
+	return self.members[player] == true or self.leader == player
 end
 
 function Activity:IsPlayerBanned(player)
-	return self.bannedSteamIds[player:GetSteamId()] ~= nil
+	return self.bannedSteamIds[player:GetSteamId()] == true
 end
 
 function Activity:IsPlayerWhitelisted(player)
-	return self.whitelistedSteamIds[player:GetSteamId()] ~= nil
+	return self.whitelistedSteamIds[player:GetSteamId()] == true
 end
 
 function Activity:ToTable()
