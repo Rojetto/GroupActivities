@@ -6,7 +6,6 @@ function GroupActivitiesClient:__init()
 
 	Network:Subscribe("ActivityList", self, self.OnActivityListReceived)
 	Events:Subscribe("KeyUp", self, self.OnKey)
-	Events:Subscribe("LocalPlayerChat", self, self.OnChat)
 end
 
 function GroupActivitiesClient:SteamIdToPlayer(steamId)
@@ -29,16 +28,8 @@ function GroupActivitiesClient:OnActivityListReceived(activityList)
 	if self.browser ~= nil then self.browser:SetActivities(self.activities) end
 end
 
-function GroupActivitiesClient:OnChat(args)
-	if args.text == "/activities" then
-		self:ShowBrowser()
-
-		return false
-	end
-end
-
 function GroupActivitiesClient:OnKey(args)
-	if args.key == string.byte('G') then
+	if args.key == Config.ActivityBrowserKey then
 		self:ShowBrowser()
 	end
 end
