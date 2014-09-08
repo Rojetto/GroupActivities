@@ -12,9 +12,10 @@ function OnActivityListReceived(activityList)
 end
 Network:Subscribe("ActivityList", OnActivityListReceived)
 
-function OnActivityCreated(newActivity)
-	Network:Send("ActivityCreated", newActivity:ToTable())
+function OnActivitySaved(args)
+	Network:Send("ActivityCreated", args.activity)
 end
+Events:Subscribe("ActivitySaved", OnActivitySaved)
 
 function OnChat(args)
 	if args.text == "/activities" then

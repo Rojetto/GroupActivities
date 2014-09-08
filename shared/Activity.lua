@@ -3,6 +3,10 @@ Access.Public = "Public"
 Access.Password = "Password"
 Access.Whitelist = "Whitelist"
 
+OnLeaveAction = {}
+OnLeaveAction.Delete = "Delete activity"
+OnLeaveAction.Promote = "Promote a random player"
+
 class("Activity")
 
 function Activity:__init(activityId, name, leader)
@@ -13,6 +17,7 @@ function Activity:__init(activityId, name, leader)
 	self.access = Access.Public
 	self.password = ""
 	self.leader = leader
+	self.onLeaveAction = OnLeaveAction.Promote
 	self.members = {}
 	self.bannedSteamIds = {}
 	self.whitelistedSteamIds = {}
@@ -26,13 +31,16 @@ end
 function Activity:PlayerQuit(player)
 	self.members[player] = nil
 	if self.leader == player then
-		if #self.members == 0 then
-			--TODO: this activity has to be removed
+		if self.onLeaveAction == OnLeaveAction.Delete then
 			self.active = false
-		else
-			local key, value = next(self.members)
-			self.leader = key
-			self.members[key] = nil
+		elseif self.onLeaveAction == OnLeaveAction.Promote then
+			if #self.members == 0 then
+				self.active = false
+			else
+				local key, value = next(self.members)
+				self.leader = key
+				self.members[key] = nil
+			end
 		end
 	end
 end
@@ -63,6 +71,7 @@ function Activity:ToTable()
 	t.access = self.access
 	t.password = self.password
 	t.leader = self.leader
+	t.onLeaveAction = self.onLeaveAction
 	t.members = self.members
 	t.bannedSteamIds = self.bannedSteamIds
 	t.whitelistedSteamIds = self.whitelistedSteamIds
@@ -78,6 +87,7 @@ function Activity.FromTable(t)
 	self.description = t.description
 	self.access = t.access
 	self.password = t.password
+	self.onLeaveAction = t.onLeaveAction
 	self.members = t.members
 	self.bannedSteamIds = t.bannedSteamIds
 	self.whitelistedSteamIds = t.whitelistedSteamIds

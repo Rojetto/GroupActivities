@@ -49,14 +49,18 @@ end
 Events:Subscribe("PlayerQuit", OnPlayerQuit)
 
 function OnActivityLeft(args)
-	activities[args.activityId]:PlayerQuit(args.player)
-	RemoveInactiveActivities()
-	BroadcastActivities()
+	if activities[args.activityId] ~= nil then
+		activities[args.activityId]:PlayerQuit(args.player)
+		RemoveInactiveActivities()
+		BroadcastActivities()
+	end
 end
 Network:Subscribe("ActivityLeft", OnActivityLeft)
 
 function OnActivityJoined(args)
-	activities[args.activityId]:PlayerJoin(args.player)
-	BroadcastActivities()
+	if activities[args.activityId] ~= nil then
+		activities[args.activityId]:PlayerJoin(args.player)
+		BroadcastActivities()
+	end
 end
 Network:Subscribe("ActivityJoined", OnActivityJoined)

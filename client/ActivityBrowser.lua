@@ -199,7 +199,7 @@ end
 
 function ActivityBrowser:OnCreateEditButtonClicked()
 	if self.editor == nil or not self.editor.active then
-		self.editor = ActivityEditor(OnActivityCreated)
+		self.editor = ActivityEditor()
 		if GetJoinedActivity() ~= nil and GetJoinedActivity().leader == LocalPlayer then
 			self.editor:SetActivity(GetJoinedActivity())
 		end

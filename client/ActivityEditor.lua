@@ -1,13 +1,13 @@
 class("ActivityEditor")(ActiveWindow)
 
-function ActivityEditor:__init(callback)
+function ActivityEditor:__init()
 	ActiveWindow.__init(self)
 
 	self.callback = callback
 	self.activity = Activity(-1, "", LocalPlayer)
 
 	self.window:SetWidthRel(0.2)
-	self.window:SetHeight(400)
+	self.window:SetHeight(450)
 	self.window:SetPositionRel(Vector2(0.5, 0.5) - self.window:GetSizeRel() / 2)
 	self.window:SetTitle("Create a group activity")
 	
@@ -64,10 +64,28 @@ function ActivityEditor:__init(callback)
 	self.banButton:SetPosition(Vector2(0, 240))
 	self.banButton:SetText("Ban/Unban players")
 
+	self.onLeaveBase = BaseWindow.Create(self.window)
+	self.onLeaveBase:SetPosition(Vector2(0, 270))
+	self.onLeaveBase:SetWidthAutoRel(1.0)
+	self.onLeaveBase:SetHeight(25)
+
+	self.onLeaveLabel = Label.Create(self.onLeaveBase)
+	self.onLeaveLabel:SetDock(GwenPosition.Left)
+	self.onLeaveLabel:SetSizeAutoRel(Vector2(0.5, 1.0))
+	self.onLeaveLabel:SetAlignment(GwenPosition.CenterV)
+	self.onLeaveLabel:SetText("When the leader leaves ")
+
+	self.onLeaveBox = ComboBox.Create(self.onLeaveBase)
+	self.onLeaveBox:SetDock(GwenPosition.Right)
+	self.onLeaveBox:SetSizeAutoRel(Vector2(0.5, 1.0))
+	self.onLeaveBox:SetAlignment(GwenPosition.CenterV)
+	self.onLeaveBox:AddItem(OnLeaveAction.Promote, OnLeaveAction.Promote)
+	self.onLeaveBox:AddItem(OnLeaveAction.Delete, OnLeaveAction.Delete)
+
 	self.promoteButton = Button.Create(self.window)
 	self.promoteButton:SetWidthAutoRel(1.0)
 	self.promoteButton:SetHeight(25)
-	self.promoteButton:SetPosition(Vector2(0, 270))
+	self.promoteButton:SetPosition(Vector2(0, 300))
 	self.promoteButton:SetText("Promote player to leader")
 	self.promoteButton:Subscribe("Press", self, self.OnPromoteButtonClick)
 	self.promoteButton:Hide()
@@ -76,7 +94,7 @@ function ActivityEditor:__init(callback)
 	self.deleteButton = Button.Create(self.window)
 	self.deleteButton:SetWidthAutoRel(1.0)
 	self.deleteButton:SetHeight(25)
-	self.deleteButton:SetPosition(Vector2(0, 300))
+	self.deleteButton:SetPosition(Vector2(0, 330))
 	self.deleteButton:SetText("Delete this activity")
 	self.deleteButton:Hide()
 
@@ -99,6 +117,7 @@ function ActivityEditor:SetActivity(activity)
 	self.descriptionBox:SetText(activity.description)
 	self.accessBox:SelectItemByName(activity.access)
 	self.passwordBox:SetText(activity.password)
+	self.onLeaveBox:SelectItemByName(activity.onLeaveAction)
 end
 
 function ActivityEditor:OnFormChanged(box)
@@ -132,7 +151,7 @@ function ActivityEditor:OnPromoteButtonClick()
 end
 
 function ActivityEditor:OnPlayerPromoted(player)
-	print(player:GetName().." is being promoted")
+	
 end
 
 function ActivityEditor:Close()
@@ -148,8 +167,9 @@ function ActivityEditor:OnSaveButtonClick()
 	self.activity.description = self.descriptionBox:GetText()
 	self.activity.access = self.accessBox:GetSelectedItem():GetText()
 	self.activity.password = self.passwordBox:GetText()
+	self.activity.onLeaveAction = self.onLeaveBox:GetSelectedItem():GetText()
 
-	self.callback(self.activity)
+	Events:Fire("ActivitySaved", {activity = self.activity:ToTable()})
 
 	self:Close()
 end
