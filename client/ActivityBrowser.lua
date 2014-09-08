@@ -96,7 +96,7 @@ function ActivityBrowser:SetActivities(activityList)
 		row:SetCellText(3, activity.access)
 		row:SetCellText(4, tostring(#(activity.members) + 1))
 
-		if id == GetJoinedActivity().id then
+		if id == GroupActivitiesClient:GetJoinedActivity().id then
 			row:SetTextColor(Color(0, 255, 0))
 			selectedRow = row
 		end
@@ -108,11 +108,11 @@ function ActivityBrowser:SetActivities(activityList)
 		self:ShowDetails(nil)
 	end
 
-	if GetJoinedActivity() == nil then
+	if GroupActivitiesClient:GetJoinedActivity() == nil then
 		self.createEditButton:SetText("Create activity")
 		self.createEditButton:SetToolTip("Create a new activity")
 	else
-		if GetJoinedActivity().leader == LocalPlayer then
+		if GroupActivitiesClient:GetJoinedActivity().leader == LocalPlayer then
 			self.createEditButton:SetText("Edit activity")
 			self.createEditButton:SetToolTip("Edit your activity settings")
 		else
@@ -177,12 +177,12 @@ function ActivityBrowser:ShowDetails(activity)
 
 		self.playerList:SetPlayers(activity.members)
 
-		if GetJoinedActivity() == nil or GetJoinedActivity().id ~= activity.id then
+		if GroupActivitiesClient:GetJoinedActivity() == nil or GroupActivitiesClient:GetJoinedActivity().id ~= activity.id then
 			if activity.access == Access.Whitelist and not activity:IsPlayerWhitelisted(LocalPlayer) then
 				self.joinLeaveButton:SetToolTip("You are not on the whitelist")
 			elseif activity:IsPlayerBanned(LocalPlayer) then
 				self.joinLeaveButton:SetToolTip("You are banned from this ativity")
-			elseif GetJoinedActivity() ~= nil then
+			elseif GroupActivitiesClient:GetJoinedActivity() ~= nil then
 				self.joinLeaveButton:SetToolTip("You have to leave the activity you are currently in first")
 			else
 				self.joinLeaveButton:SetEnabled(true)
@@ -200,17 +200,17 @@ end
 function ActivityBrowser:OnCreateEditButtonClicked()
 	if self.editor == nil or not self.editor.active then
 		self.editor = ActivityEditor()
-		if GetJoinedActivity() ~= nil and GetJoinedActivity().leader == LocalPlayer then
-			self.editor:SetActivity(GetJoinedActivity())
+		if GroupActivitiesClient:GetJoinedActivity() ~= nil and GroupActivitiesClient:GetJoinedActivity().leader == LocalPlayer then
+			self.editor:SetActivity(GroupActivitiesClient:GetJoinedActivity())
 		end
 	end
 end
 
 function ActivityBrowser:OnJoinLeaveButtonClicked()
 	if GetJoinedActivity() == self:GetSelectedActivity() then
-		LeaveActivity(self:GetSelectedActivity())
+		GroupActivitiesClient:LeaveActivity(self:GetSelectedActivity())
 	else
-		JoinActivity(self:GetSelectedActivity())
+		GroupActivitiesClient:JoinActivity(self:GetSelectedActivity())
 	end
 end
 

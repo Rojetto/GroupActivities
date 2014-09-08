@@ -26,6 +26,6 @@ function PlayerSelector:OnRowSelected()
 end
 
 function PlayerSelector:OnFinishButtonClick()
-	Events:Fire("PlayerPromoted", self.playerList:GetSelectedPlayer())
+	Events:Fire("PlayerSelected", self.playerList:GetSelectedPlayer())
 	self:Close()
 end

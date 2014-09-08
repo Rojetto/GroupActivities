@@ -89,7 +89,7 @@ function ActivityEditor:__init()
 	self.promoteButton:SetText("Promote player to leader")
 	self.promoteButton:Subscribe("Press", self, self.OnPromoteButtonClick)
 	self.promoteButton:Hide()
-	self.promoteEvent = Events:Subscribe("PlayerPromoted", self, self.OnPlayerPromoted)
+	self.promoteEvent = Events:Subscribe("PlayerSelected", self, self.OnPlayerPromoted)
 
 	self.deleteButton = Button.Create(self.window)
 	self.deleteButton:SetWidthAutoRel(1.0)
@@ -148,21 +148,19 @@ function ActivityEditor:OnPromoteButtonClick()
 	if self.promoteWindow == nil or not self.promoteWindow.active then
 		self.promoteWindow = PlayerSelector()
 		self.promoteWindow.window:SetTitle("Select player from this activity to promote")
-		self.promoteWindow.playerList:SetPlayers(self.members)
+		self.promoteWindow.playerList:SetPlayers(self.activity.members)
 	end
 end
 
 function ActivityEditor:OnPlayerPromoted(player)
-	PromotePlayer(self.activity, player)
+	GroupActivitiesClient:PromotePlayer(self.activity, player)
 	self:Close()
 end
 
-function ActivityEditor:Close()
-	if self.active then
-		Events:Unsubscribe(self.promoteEvent)
-	end
-	if self.promoteWindow ~= nil then self.promoteWindow:Close() end
-	ActiveWindow.Close(self)
+function ActivityEditor:OnDeleteButtonClick()
+	GroupActivitiesClient:DeleteActivity(self.activity)
+
+	self:Close()
 end
 
 function ActivityEditor:OnSaveButtonClick()
@@ -172,13 +170,15 @@ function ActivityEditor:OnSaveButtonClick()
 	self.activity.password = self.passwordBox:GetText()
 	self.activity.onLeaveAction = self.onLeaveBox:GetSelectedItem():GetText()
 
-	SaveActivity(self.activity)
+	GroupActivitiesClient:SaveActivity(self.activity)
 
 	self:Close()
 end
 
-function ActivityEditor:OnDeleteButtonClick()
-	DeleteActivity(self.activity)
-
-	self:Close()
+function ActivityEditor:Close()
+	if self.active then
+		Events:Unsubscribe(self.promoteEvent)
+	end
+	if self.promoteWindow ~= nil then self.promoteWindow:Close() end
+	ActiveWindow.Close(self)
 end
