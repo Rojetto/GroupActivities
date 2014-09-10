@@ -1,5 +1,5 @@
 ## Overview ##
-GroupActivities is a script for Just Cause 2 Multiplayer servers that group functionalities.  
+GroupActivities is a script for Just Cause 2 Multiplayer servers that add group functionalities.  
 The difference to existing plugins is the nature of groups. They are not permanent like factions, but temporary, easy to create and delete for everyone. That's why they're often only called "Activities" in the script.  
 GroupActivities is completely GUI-controlled. Everything starts with opening the activity browser (standard: F7). From there, everyone can create his own activity or join an existing one.
 
@@ -9,6 +9,8 @@ Activities are temporary groups of people that do one specific thing together on
 * Activity leaders don't have to spam the chat with "roadtrip /tpm 178 peaceful"
 * Activity members can always get displayed where the leader is so that they don't get lost
 * If someone gets lost anyway, they can always teleport to the leader of the activity with one click
+
+Examples of activities include: roadtrips, airtrips, boattrips, skyjumps, races, airshows or just hanging around together.
 
 ## Activity leaders ##
 Once someone creates an activity they automatically become its leader. Leaders have several options to customize their activity:
