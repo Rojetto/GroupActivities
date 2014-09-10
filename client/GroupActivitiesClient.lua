@@ -53,40 +53,54 @@ function GroupActivitiesClient:ShowBrowser()
 end
 
 function GroupActivitiesClient:RenderArrow()
-	--if self.browser == nil or not self.browser:IsArrowEnabled() or self:GetJoinedActivity() == nil or self:GetJoinedActivity().leader == LocalPlayer then return end
+	if self.browser == nil or not self.browser:IsArrowEnabled() or self:GetJoinedActivity() == nil or self:GetJoinedActivity().leader == LocalPlayer then return end
+	if Game:GetState() ~= GUIState.Game then return end
 
-	local color = Color(0, 255, 0)
+	local color = Color(0, 255, 0, 150)
 
-	--local leaderPosition = self:GetJoinedActivity().leader:GetPosition()
-	local leaderPosition = Vector3(-9832, 267, -2867)
-	--local base = LocalPlayer:GetPosition() + (LocalPlayer:GetAngle() * Vector3(0, 2, 0))
+	local leaderPosition = self:GetJoinedActivity().leader:GetPosition()
+
 	local base = Camera:GetPosition() + (Camera:GetAngle() * Vector3(0, 1.5, -7))
 	local direction = (leaderPosition - base):Normalized()
 	local squashedDirection = Vector3(direction.x, 0, direction.z):Normalized()
 	local cross = direction:Cross(squashedDirection):Normalized()
+	local vert = direction:Cross(cross):Normalized()
 
 	local arrowShaftWidth = 0.25
-	local arrowShaftLength = 1
+	local arrowShaftLength = 0.5
 	local arrowHeadWidth = 0.5
 	local arrowHeadLength = 0.25
 
-	local halfShaftBase = cross * (arrowShaftWidth / 2)
-	local shaftLength = direction * arrowShaftLength
-	local headBase = cross * (arrowHeadWidth / 2) - halfShaftBase
-	local headDiagonal = cross * (arrowHeadWidth / 2) * (-1) + (direction * arrowHeadLength)
-	local flippedHeadDiagonal = cross * (arrowHeadWidth / 2) + (direction * arrowHeadLength)
+	local a = cross * (arrowShaftWidth / 2)
+	local b = direction * arrowShaftLength
+	local c = cross * (arrowHeadWidth / 2) - a
+	local d = direction * arrowHeadLength
 
-	Render:DrawLine(base, base + halfShaftBase, color)
-	Render:DrawLine(base + halfShaftBase, base + halfShaftBase + shaftLength, color)
-	Render:DrawLine(base + halfShaftBase + shaftLength, base + halfShaftBase + shaftLength + headBase, color)
-	Render:DrawLine(base + halfShaftBase + shaftLength + headBase, base + halfShaftBase + shaftLength + headBase + headDiagonal, color)
+	Render:FillTriangle(base + a, base + a + b, base - a, color)
+	Render:FillTriangle(base + a + b, base - a + b, base - a, color)
+	Render:FillTriangle(base + a + b + c, base + b + d, base - a + b - c, color)
 
-	Render:DrawLine(base, base - halfShaftBase, color)
-	Render:DrawLine(base - halfShaftBase, base - halfShaftBase + shaftLength, color)
-	Render:DrawLine(base - halfShaftBase + shaftLength, base - halfShaftBase + shaftLength - headBase, color)
-	Render:DrawLine(base - halfShaftBase + shaftLength - headBase, base - halfShaftBase + shaftLength - headBase + flippedHeadDiagonal, color)
+	a = vert * (arrowShaftWidth / 2)
+	c = vert * (arrowHeadWidth / 2) - a
 
-	Render:DrawText(Vector2(100, 300), math.floor(base.x).." "..math.floor(base.y).." "..math.floor(base.z), Color(255, 255, 255))
+	Render:FillTriangle(base + a, base + a + b, base - a, color)
+	Render:FillTriangle(base + a + b, base - a + b, base - a, color)
+	Render:FillTriangle(base + a + b + c, base + b + d, base - a + b - c, color)
+
+	local distance = (leaderPosition - LocalPlayer:GetPosition()):Length()
+	local distanceText = math.floor(distance).." m"
+	if distance > 1000 then
+		distanceText = (math.floor(distance / 10) / 100).." km"
+	end
+	local boxWidth = Render:GetTextWidth(distanceText, 20) + 10
+	local boxHeight = Render:GetTextHeight(distanceText, 20) + 10
+
+	local screenPos, onScreen = Render:WorldToScreen(leaderPosition)
+	if onScreen then
+		Render:DrawCircle(screenPos, 15, color)
+		Render:FillArea(screenPos + Vector2(20, (-1) * boxHeight / 2), Vector2(boxWidth, boxHeight), Color(0, 0, 0, 150))
+		Render:DrawText(screenPos + Vector2(25, -7), distanceText, Color(255, 255, 255), 20)
+	end
 end
 
 function GroupActivitiesClient:JoinActivity(activity)
