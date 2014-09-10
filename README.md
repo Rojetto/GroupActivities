@@ -10,7 +10,7 @@ Activities are temporary groups of people that do one specific thing together on
 * Activity members can always get displayed where the leader is so that they don't get lost
 * If someone gets lost anyway, they can always teleport to the leader of the activity with one click
 
-Examples of activities include: roadtrips, airtrips, boattrips, skyjumps, races, airshows or just hanging out together.
+Examples of activities include: roadtrips, airtrips, boattrips, skydives, races, airshows or just hanging out together.
 
 ## Activity leaders ##
 Once someone creates an activity they automatically become its leader. Leaders have several options to customize their activity:
