@@ -35,7 +35,7 @@ function ActivityBrowser:__init()
 	self.detailsButtons = BaseWindow.Create(self.details)
 	self.detailsButtons:SetDock(GwenPosition.Bottom)
 	self.detailsButtons:SetWidthAutoRel(1.0)
-	self.detailsButtons:SetHeight(55)
+	self.detailsButtons:SetHeight(85)
 	self.detailsButtons:SetPadding(Vector2(0, 5), Vector2(0, 0))
 
 	self.nameLabel = Label.Create(self.detailsGroup)
@@ -72,15 +72,27 @@ function ActivityBrowser:__init()
 	self.playerList:SetWidthAutoRel(1.0)
 	self.playerList:SetPosition(Vector2(0, 225))
 
+	self.arrowLabel = Label.Create(self.detailsButtons)
+	self.arrowLabel:SetText("Show arrow to leader")
+	self.arrowLabel:SizeToContents()
+	self.arrowLabel:SetHeight(25)
+	self.arrowLabel:SetAlignment(GwenPosition.CenterV)
+
+	self.arrowBox = CheckBox.Create(self.detailsButtons)
+	self.arrowBox:SetPosition(Vector2(150, 5))
+	self.arrowBox:SetChecked(true)
+
 	self.teleportButton = Button.Create(self.detailsButtons)
+	self.teleportButton:SetPosition(Vector2(0, 30))
 	self.teleportButton:SetHeight(25)
 	self.teleportButton:SetWidthAutoRel(1.0)
 	self.teleportButton:SetText("Teleport to leader")
 	self.teleportButton:Subscribe("Press", self, self.OnTeleportButtonClick)
 
 	self.joinLeaveButton = Button.Create(self.detailsButtons)
-	self.joinLeaveButton:SetDock(GwenPosition.Bottom)
+	self.joinLeaveButton:SetPosition(Vector2(0, 60))
 	self.joinLeaveButton:SetHeight(25)
+	self.joinLeaveButton:SetWidthAutoRel(1.0)
 	self.joinLeaveButton:Subscribe("Press", self, self.OnJoinLeaveButtonClicked)
 
 	self.createEditButton = Button.Create(self.window)
@@ -157,6 +169,10 @@ end
 function ActivityBrowser:OnRowSelected()
 	local activity = self:GetSelectedActivity()
 	self:ShowDetails(activity)
+end
+
+function ActivityBrowser:IsArrowEnabled()
+	return self.arrowBox:GetChecked()
 end
 
 function ActivityBrowser:ShowDetails(activity)
