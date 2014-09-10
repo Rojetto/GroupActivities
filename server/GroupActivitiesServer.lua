@@ -37,7 +37,6 @@ function GroupActivitiesServer:BroadcastActivities()
 	for id, activity in pairs(self.activities) do
 		activityTables[id] = activity:ToTable()
 	end
-	print(#activityTables)
 	Network:Broadcast("ActivityList", activityTables)
 end
 
