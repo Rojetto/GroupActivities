@@ -7,6 +7,13 @@ function GroupActivitiesClient:__init()
 	Network:Subscribe("ActivityList", self, self.OnActivityListReceived)
 	Events:Subscribe("KeyUp", self, self.OnKey)
 	Events:Subscribe("Render", self, self.RenderArrow)
+	Events:Subscribe("ModulesLoad", self, self.OnLoad)
+end
+
+function GroupActivitiesClient:OnLoad()
+	if Config.OpenOnJoin then
+		self:ShowBrowser()
+	end
 end
 
 function GroupActivitiesClient:SteamIdToPlayer(steamId)

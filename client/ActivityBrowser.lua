@@ -105,6 +105,7 @@ function ActivityBrowser:__init()
 	self.activities = {}
 
 	Events:Subscribe("LocalPlayerInput", self, self.OnLocalPlayerInput)
+	Events:Subscribe("Render", self, self.OnRender)
 
 	self:ShowDetails(nil)
 end
@@ -152,8 +153,17 @@ function ActivityBrowser:OnWindowClosed()
 end
 
 function ActivityBrowser:OnLocalPlayerInput()
-	Mouse:SetVisible(self.active)
+	Mouse:SetVisible(self.active and self.window:GetVisible())
 	return not self.active
+end
+
+function ActivityBrowser:OnRender()
+	if self.window:GetVisible() and Game:GetState() ~= GUIState.Game then
+		self.window:Hide()
+	end
+	if self.active and not self.window:GetVisible() and Game:GetState() == GUIState.Game then
+		self.window:Show()
+	end
 end
 
 function ActivityBrowser:SetActive(active)
@@ -163,6 +173,7 @@ function ActivityBrowser:SetActive(active)
 	else
 		self.window:Hide()
 		if self.editor ~= nil then self.editor:Close() end
+		if self.passwordWindow ~= nil then self.passwordWindow:Close() end
 	end
 end
 
@@ -246,8 +257,18 @@ function ActivityBrowser:OnJoinLeaveButtonClicked()
 	if GroupActivitiesClient:GetJoinedActivity() == self:GetSelectedActivity() then
 		GroupActivitiesClient:LeaveActivity(self:GetSelectedActivity())
 	else
-		GroupActivitiesClient:JoinActivity(self:GetSelectedActivity())
+		if (self:GetSelectedActivity().access ~= Access.Password) then
+			GroupActivitiesClient:JoinActivity(self:GetSelectedActivity())
+		else
+			if self.passwordWindow == nil or not self.passwordWindow.active then
+				self.passwordWindow = PasswordWindow(self:GetSelectedActivity(), self, self.OnPasswordEntered)
+			end
+		end
 	end
+end
+
+function ActivityBrowser:OnPasswordEntered(activity)
+	GroupActivitiesClient:JoinActivity(activity)
 end
 
 function ActivityBrowser:GetSelectedActivity()
