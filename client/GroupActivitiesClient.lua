@@ -71,4 +71,8 @@ function GroupActivitiesClient:DeleteActivity(activity)
 	Network:Send("ActivityDeleted", {activityId = activity.id})
 end
 
+function GroupActivitiesClient:TeleportToLeader()
+	Network:Send("TeleportToLeader", LocalPlayer)
+end
+
 GroupActivitiesClient = GroupActivitiesClient()

@@ -9,6 +9,7 @@ function GroupActivitiesServer:__init()
 	Network:Subscribe("PlayerPromoted", self, self.OnPlayerPromoted)
 	Network:Subscribe("ActivitySaved", self, self.OnActivitySaved)
 	Network:Subscribe("ActivityDeleted", self, self.OnActivityDeleted)
+	Network:Subscribe("TeleportToLeader", self, self.OnTeleportToLeader)
 end
 
 function GroupActivitiesServer:SteamIdToPlayer(steamId)
@@ -41,7 +42,7 @@ function GroupActivitiesServer:BroadcastActivities()
 end
 
 function GroupActivitiesServer:GetJoinedActivity(player)
-	for id, activity in pairs(activities) do
+	for id, activity in pairs(self.activities) do
 		if activity:IsPlayerInActivity(player) then
 			return activity
 		end
@@ -99,6 +100,15 @@ function GroupActivitiesServer:OnActivityDeleted(args)
 		self.activities[args.activityId].active = false
 		self:RemoveInactiveActivities()
 		self:BroadcastActivities()
+	end
+end
+
+function GroupActivitiesServer:OnTeleportToLeader(player)
+	local activity = self:GetJoinedActivity(player)
+
+	if activity ~= nil then
+		player:SetWorld(activity.leader:GetWorld())
+		player:SetPosition(activity.leader:GetPosition())
 	end
 end
 

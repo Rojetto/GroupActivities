@@ -32,6 +32,12 @@ function ActivityBrowser:__init()
 	self.detailsGroup = GroupBox.Create(self.details)
 	self.detailsGroup:SetDock(GwenPosition.Fill)
 
+	self.detailsButtons = BaseWindow.Create(self.details)
+	self.detailsButtons:SetDock(GwenPosition.Bottom)
+	self.detailsButtons:SetWidthAutoRel(1.0)
+	self.detailsButtons:SetHeight(55)
+	self.detailsButtons:SetPadding(Vector2(0, 5), Vector2(0, 0))
+
 	self.nameLabel = Label.Create(self.detailsGroup)
 	self.nameLabel:SetHeight(25)
 	self.nameLabel:SetWidthAutoRel(1.0)
@@ -66,7 +72,13 @@ function ActivityBrowser:__init()
 	self.playerList:SetWidthAutoRel(1.0)
 	self.playerList:SetPosition(Vector2(0, 225))
 
-	self.joinLeaveButton = Button.Create(self.details)
+	self.teleportButton = Button.Create(self.detailsButtons)
+	self.teleportButton:SetHeight(25)
+	self.teleportButton:SetWidthAutoRel(1.0)
+	self.teleportButton:SetText("Teleport to leader")
+	self.teleportButton:Subscribe("Press", self, self.OnTeleportButtonClick)
+
+	self.joinLeaveButton = Button.Create(self.detailsButtons)
 	self.joinLeaveButton:SetDock(GwenPosition.Bottom)
 	self.joinLeaveButton:SetHeight(25)
 	self.joinLeaveButton:Subscribe("Press", self, self.OnJoinLeaveButtonClicked)
@@ -156,6 +168,7 @@ function ActivityBrowser:ShowDetails(activity)
 	self.descriptionBox:SetHeight(100)
 	self.playerList:SetPlayers({})
 
+	self.teleportButton:SetEnabled(false)
 	self.joinLeaveButton:SetText("Join")
 	self.joinLeaveButton:SetToolTip("You need to select an activity")
 	self.joinLeaveButton:SetEnabled(false)
@@ -165,6 +178,8 @@ function ActivityBrowser:ShowDetails(activity)
 		self.leaderLabel:SetText("Leader: "..activity.leader:GetName())
 		self.accessLabel:SetText("Access: "..activity.access)
 		self.playersLabel:SetText("Players: "..(#(activity.members) + 1))
+
+		self.teleportButton:SetEnabled(true)
 
 		if activity.description ~= "" then
 			self.descriptionBox:SetText(activity.description)
@@ -204,6 +219,11 @@ function ActivityBrowser:OnCreateEditButtonClicked()
 			self.editor:SetActivity(GroupActivitiesClient:GetJoinedActivity())
 		end
 	end
+end
+
+function ActivityBrowser:OnTeleportButtonClick()
+	GroupActivitiesClient:TeleportToLeader()
+	self:SetActive(false)
 end
 
 function ActivityBrowser:OnJoinLeaveButtonClicked()
