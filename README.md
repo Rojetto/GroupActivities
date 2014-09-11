@@ -13,13 +13,14 @@ Activities are temporary groups of people that do one specific thing together on
 Examples of activities include: roadtrips, airtrips, boattrips, skydives, races, airshows or just hanging out together.
 
 ## Activity leaders ##
-Once someone creates an activity they automatically become its leader. Leaders have several options to customize their activity:
-* They can give the activity a name and description
-* They can make an activity public, password protected or whitelist-only
-* They can ban disruptive players from the activity
-* They can restrict the allowed vehicles if they want a themed trip
-* They can promote a new leader to take over the activity
-* They can control what happens when they leave the server. Should the activity be automatically deleted or should a random member be promoted to leader?
+Once someone creates an activity they automatically become its leader. Leaders have several options to customize their activity. They can
+* give the activity a name and description
+* make the activity public, password protected or whitelist-only
+* ban disruptive players from the activity
+* restrict the allowed vehicles if they want a themed trip
+* block boosting in vehicles
+* promote a new leader to take over the activity
+* control what happens when they leave the server. Should the activity be automatically deleted or should a random member be promoted to leader?
 
 ## Configuration ##
 To configure this script, open "GroupActivites" in your server's script folder and go to "client". In "Config.lua" you can configure the following options:
