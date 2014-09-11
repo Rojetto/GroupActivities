@@ -10,6 +10,7 @@ function GroupActivitiesServer:__init()
 	Network:Subscribe("ActivitySaved", self, self.OnActivitySaved)
 	Network:Subscribe("ActivityDeleted", self, self.OnActivityDeleted)
 	Network:Subscribe("TeleportToLeader", self, self.OnTeleportToLeader)
+	Network:Subscribe("VehicleVelocity", self, self.OnVehicleVelocity)
 end
 
 function GroupActivitiesServer:SteamIdToPlayer(steamId)
@@ -109,6 +110,13 @@ function GroupActivitiesServer:OnTeleportToLeader(player)
 		player:SetWorld(activity.leader:GetWorld())
 		player:SetPosition(activity.leader:GetPosition())
 	end
+end
+
+function GroupActivitiesServer:OnVehicleVelocity(args)
+	if not args.player:InVehicle() then return end
+	if not args.player:GetState() == PlayerState.InVehicle then return end
+
+	args.player:GetVehicle():SetLinearVelocity(args.velocity)
 end
 
 GroupActivitiesServer = GroupActivitiesServer()

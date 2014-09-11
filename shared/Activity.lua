@@ -22,6 +22,7 @@ function Activity:__init(activityId, name, leader)
 	self.bannedSteamIds = {}
 	self.whitelistedSteamIds = {}
 	self.allowedVehicles = {}
+	self.boost = true
 end
 
 function Activity:PlayerJoin(player)
@@ -160,6 +161,7 @@ function Activity:ToTable()
 	t.bannedSteamIds = self.bannedSteamIds
 	t.whitelistedSteamIds = self.whitelistedSteamIds
 	t.allowedVehicles = self.allowedVehicles
+	t.boost = self.boost
 
 	return t
 end
@@ -176,6 +178,7 @@ function Activity.FromTable(t)
 	self.bannedSteamIds = t.bannedSteamIds
 	self.whitelistedSteamIds = t.whitelistedSteamIds
 	self.allowedVehicles = t.allowedVehicles
+	self.boost = t.boost
 
 	return self
 end

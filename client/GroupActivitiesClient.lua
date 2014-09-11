@@ -3,6 +3,7 @@ class("GroupActivitiesClient")
 function GroupActivitiesClient:__init()
 	self.activities = {}
 	self.browser = nil
+	self.antiBoost = AntiBoost()
 
 	Network:Subscribe("ActivityList", self, self.OnActivityListReceived)
 	Events:Subscribe("KeyUp", self, self.OnKey)
@@ -132,6 +133,10 @@ end
 
 function GroupActivitiesClient:TeleportToLeader()
 	Network:Send("TeleportToLeader", LocalPlayer)
+end
+
+function GroupActivitiesClient:SetVehicleVelocity(velocity)
+	Network:Send("VehicleVelocity", {player = LocalPlayer, velocity = velocity})
 end
 
 GroupActivitiesClient = GroupActivitiesClient()
