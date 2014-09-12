@@ -70,12 +70,12 @@ function GroupActivitiesClient:ShowBrowser()
 end
 
 function GroupActivitiesClient:RenderArrow()
-	if self.browser == nil or not self.browser:IsArrowEnabled() or self:GetJoinedActivity() == nil or self:GetJoinedActivity().leader == LocalPlayer then return end
+	if self.browser == nil or not self.browser:IsArrowEnabled() or self:GetJoinedActivity() == nil or self:GetJoinedActivity().leaderId == LocalPlayer:GetId() then return end
 	if Game:GetState() ~= GUIState.Game then return end
 
 	local color = Color(0, 255, 0, 150)
 
-	local leaderPosition = self:GetJoinedActivity().leader:GetPosition()
+	local leaderPosition = Player.GetById(self:GetJoinedActivity().leaderId):GetPosition()
 
 	local base = Camera:GetPosition() + (Camera:GetAngle() * Vector3(0, 1.5, -7))
 	local direction = (leaderPosition - base):Normalized()
@@ -129,15 +129,15 @@ function GroupActivitiesClient:RenderMessage()
 end
 
 function GroupActivitiesClient:JoinActivity(activity)
-	Network:Send("ActivityJoined", {activityId = activity.id, player = LocalPlayer})
+	Network:Send("ActivityJoined", {activityId = activity.id, playerId = LocalPlayer:GetId()})
 end
 
 function GroupActivitiesClient:LeaveActivity(activity)
-	Network:Send("ActivityLeft", {activityId = activity.id, player = LocalPlayer})
+	Network:Send("ActivityLeft", {activityId = activity.id, playerId = LocalPlayer:GetId()})
 end
 
 function GroupActivitiesClient:PromotePlayer(activity, player)
-	Network:Send("PlayerPromoted", {activityId = activity.id, player = player})
+	Network:Send("PlayerPromoted", {activityId = activity.id, playerId = player})
 end
 
 function GroupActivitiesClient:SaveActivity(activity)
@@ -149,11 +149,11 @@ function GroupActivitiesClient:DeleteActivity(activity)
 end
 
 function GroupActivitiesClient:TeleportToLeader()
-	Network:Send("TeleportToLeader", LocalPlayer)
+	Network:Send("TeleportToLeader", LocalPlayer:GetId())
 end
 
 function GroupActivitiesClient:SetVehicleVelocity(velocity)
-	Network:Send("VehicleVelocity", {player = LocalPlayer, velocity = velocity})
+	Network:Send("VehicleVelocity", {playerId = LocalPlayer:GetId(), velocity = velocity})
 end
 
 GroupActivitiesClient = GroupActivitiesClient()

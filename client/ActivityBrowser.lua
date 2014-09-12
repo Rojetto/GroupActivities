@@ -130,11 +130,11 @@ function ActivityBrowser:SetActivities(activityList)
 	for id, activity in pairs(activityList) do
 		local row = self.activityList:AddItem(tostring(activity.id))
 		row:SetCellText(1, activity.name)
-		row:SetCellText(2, activity.leader:GetName())
+		row:SetCellText(2, Player.GetById(activity.leaderId):GetName())
 		row:SetCellText(3, activity.access)
-		row:SetCellText(4, tostring(#(activity.members) + 1))
+		row:SetCellText(4, tostring(#(activity.memberIds) + 1))
 
-		if id == GroupActivitiesClient:GetJoinedActivity().id then
+		if GroupActivitiesClient:GetJoinedActivity() ~= nil and id == GroupActivitiesClient:GetJoinedActivity().id then
 			row:SetTextColor(Color(0, 255, 0))
 			selectedRow = row
 		end
@@ -150,7 +150,7 @@ function ActivityBrowser:SetActivities(activityList)
 		self.createEditButton:SetText("Create activity")
 		self.createEditButton:SetToolTip("Create a new activity")
 	else
-		if GroupActivitiesClient:GetJoinedActivity().leader == LocalPlayer then
+		if GroupActivitiesClient:GetJoinedActivity().leaderId == LocalPlayer:GetId() then
 			self.createEditButton:SetText("Edit activity")
 			self.createEditButton:SetToolTip("Edit your activity settings")
 		else
@@ -218,9 +218,9 @@ function ActivityBrowser:ShowDetails(activity)
 
 	if activity ~= nil then
 		self.nameLabel:SetText("Name: "..activity.name)
-		self.leaderLabel:SetText("Leader: "..activity.leader:GetName())
+		self.leaderLabel:SetText("Leader: "..Player.GetById(activity.leaderId):GetName())
 		self.accessLabel:SetText("Access: "..activity.access)
-		self.playersLabel:SetText("Players: "..(#(activity.members) + 1))
+		self.playersLabel:SetText("Players: "..(#(activity.memberIds) + 1))
 		self.boostLabel:SetText("Boost allowed: " .. (activity.boost and "yes" or "no"))
 
 		self.vehiclesButton:SetEnabled(true)
@@ -235,7 +235,11 @@ function ActivityBrowser:ShowDetails(activity)
 			self.descriptionBox:SetWidthAutoRel(0.95)
 		end
 
-		self.playerList:SetPlayers(activity.members)
+		local memberList = {}
+		for memberId, _ in pairs(activity.memberIds) do
+			memberList[Player.GetById(memberId)] = true
+		end
+		self.playerList:SetPlayers(memberList)
 
 		if GroupActivitiesClient:GetJoinedActivity() == nil or GroupActivitiesClient:GetJoinedActivity().id ~= activity.id then
 			if activity.access == Access.Whitelist and not activity:IsPlayerWhitelisted(LocalPlayer) then
@@ -260,7 +264,7 @@ end
 function ActivityBrowser:OnCreateEditButtonClicked()
 	if self.editor == nil or not self.editor.active then
 		self.editor = ActivityEditor()
-		if GroupActivitiesClient:GetJoinedActivity() ~= nil and GroupActivitiesClient:GetJoinedActivity().leader == LocalPlayer then
+		if GroupActivitiesClient:GetJoinedActivity() ~= nil and GroupActivitiesClient:GetJoinedActivity().leaderId == LocalPlayer:GetId() then
 			self.editor:SetActivity(GroupActivitiesClient:GetJoinedActivity())
 		end
 	end

@@ -9,16 +9,16 @@ OnLeaveAction.Promote = "Promote a random player"
 
 class("Activity")
 
-function Activity:__init(activityId, name, leader)
+function Activity:__init(activityId, name, leaderId)
 	self.active = true
 	self.id = activityId
 	self.name = name
 	self.description = ""
 	self.access = Access.Public
 	self.password = ""
-	self.leader = leader
+	self.leaderId = leaderId
 	self.onLeaveAction = OnLeaveAction.Promote
-	self.members = {}
+	self.memberIds = {}
 	self.bannedSteamIds = {}
 	self.whitelistedSteamIds = {}
 	self.allowedVehicles = {}
@@ -29,40 +29,43 @@ function Activity:__init(activityId, name, leader)
 end
 
 function Activity:PlayerJoin(player)
-	self.members[player] = true
+	self.memberIds[player:GetId()] = true
 end
 
 function Activity:PlayerQuit(player)
-	self.members[player] = nil
-	if self.leader == player then
+	local playerId = player:GetId()
+	self.memberIds[playerId] = nil
+	if self.leaderId == playerId then
 		if self.onLeaveAction == OnLeaveAction.Delete then
 			self.active = false
 		elseif self.onLeaveAction == OnLeaveAction.Promote then
-			if #self.members == 0 then
+			if #self.memberIds == 0 then
 				self.active = false
 			else
-				local key, value = next(self.members)
-				self.leader = key
-				self.members[key] = nil
+				local key, value = next(self.memberIds)
+				self.leaderId = key
+				self.memberIds[key] = nil
 			end
 		end
 	end
 end
 
 function Activity:PromotePlayer(player)
-	if self.members[player] == true then
-		self.members[self.leader] = true
-		self.members[player] = nil
-		self.leader = player
+	local playerId = player:GetId()
+	if self.memberIds[playerId] == true then
+		self.memberIds[self.leaderId] = true
+		self.memberIds[playerId] = nil
+		self.leaderId = playerId
 	end
 end
 
 function Activity:IsVehicleAllowed(vehicleId)
-	return self.allowedVehicles[vehicleId] == true
+	return self.allowedVehicles[vehicleId]
 end
 
 function Activity:IsPlayerInActivity(player)
-	return self.members[player] == true or self.leader == player
+	local playerId = player:GetId()
+	return self.memberIds[playerId] == true or self.leaderId == playerId
 end
 
 function Activity:IsPlayerBanned(player)
@@ -158,9 +161,9 @@ function Activity:ToTable()
 	t.description = self.description
 	t.access = self.access
 	t.password = self.password
-	t.leader = self.leader
+	t.leaderId = self.leaderId
 	t.onLeaveAction = self.onLeaveAction
-	t.members = self.members
+	t.memberIds = self.memberIds
 	t.bannedSteamIds = self.bannedSteamIds
 	t.whitelistedSteamIds = self.whitelistedSteamIds
 	t.allowedVehicles = self.allowedVehicles
@@ -170,14 +173,14 @@ function Activity:ToTable()
 end
 
 function Activity.FromTable(t)
-	local self = Activity(t.id, t.name, t.leader)
+	local self = Activity(t.id, t.name, t.leaderId)
 
 	self.active = t.active
 	self.description = t.description
 	self.access = t.access
 	self.password = t.password
 	self.onLeaveAction = t.onLeaveAction
-	self.members = t.members
+	self.memberIds = t.memberIds
 	self.bannedSteamIds = t.bannedSteamIds
 	self.whitelistedSteamIds = t.whitelistedSteamIds
 	self.allowedVehicles = t.allowedVehicles

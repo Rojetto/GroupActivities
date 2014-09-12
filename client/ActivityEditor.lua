@@ -4,7 +4,7 @@ function ActivityEditor:__init()
 	ActiveWindow.__init(self)
 
 	self.callback = callback
-	self.activity = Activity(-1, "", LocalPlayer)
+	self.activity = Activity(-1, "", LocalPlayer:GetId())
 
 	self.window:SetSize(Vector2(300, 480))
 	self.window:SetMinimumSize(Vector2(300, 480))
@@ -187,7 +187,11 @@ function ActivityEditor:OnPromoteButtonClick()
 	if self.promoteWindow == nil or not self.promoteWindow.active then
 		self.promoteWindow = PlayerSelector(self, self.OnPlayerPromoted)
 		self.promoteWindow.window:SetTitle("Select player from this activity to promote")
-		self.promoteWindow.playerList:SetPlayers(self.activity.members)
+		local memberList = {}
+		for memberId, _ in pairs(activity.memberIds) do
+			memberList[Player.GetById(memberId)] = true
+		end
+		self.promoteWindow.playerList:SetPlayers(memberList)
 	end
 end
 

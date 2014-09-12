@@ -1,17 +1,21 @@
 class("PasswordWindow")(ActiveWindow)
 
 function PasswordWindow:__init(activity, callbackObject, callbackFunction)
+	ActiveWindow.__init(self)
+
 	self.activity = activity
 	self.callbackObject = callbackObject
 	self.callbackFunction = callbackFunction
 
 	self.window:SetTitle("Enter password")
-	self.window:SetSize(Vector2(500, 200))
-	self.window:DisableResizing()
+	self.window:SetSize(Vector2(200, 120))
+	self.window:SetPositionRel(Vector2(0.5, 0.5) - self.window:GetSizeRel() / 2)
 
 	self.label = Label.Create(self.window)
 	self.label:SetText("Enter password to join.")
-	self.label:SizeToContents()
+	self.label:SetWidthAutoRel(1.0)
+	self.label:SetHeight(25)
+	self.label:SetAlignment(GwenPosition.CenterV)
 
 	self.passwordBox = PasswordTextBox.Create(self.window)
 	self.passwordBox:SetPosition(Vector2(0, 30))
@@ -29,5 +33,6 @@ end
 function PasswordWindow:OnJoinButtonClick()
 	if self.passwordBox:GetText() == self.activity.password then
 		self.callbackFunction(self.callbackObject, self.activity)
+		self:Close()
 	end
 end

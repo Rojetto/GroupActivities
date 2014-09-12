@@ -4,6 +4,7 @@ function GroupActivitiesServer:__init()
 	self.activities = {}
 	Events:Subscribe("ClientModuleLoad", self, self.OnClientModuleLoad)
 	Events:Subscribe("PlayerQuit", self, self.OnPlayerQuit)
+	Events:Subscribe("PlayerEnterVehicle", self, self.OnPlayerEnterVehicle)
 	Network:Subscribe("ActivityLeft", self, self.OnActivityLeft)
 	Network:Subscribe("ActivityJoined", self, self.OnActivityJoined)
 	Network:Subscribe("PlayerPromoted", self, self.OnPlayerPromoted)
@@ -49,6 +50,13 @@ function GroupActivitiesServer:GetJoinedActivity(player)
 	end
 end
 
+function GroupActivitiesServer:OnPlayerEnterVehicle(args)
+	if self:GetJoinedActivity(args.player) ~= nil and not self:GetJoinedActivity(args.player).allowedVehicles[args.vehicle:GetModelId()] then
+		args.player:SetPosition(args.player:GetPosition())
+		Network:Send(args.player, "Message", "This vehicle is not allowed in this activity")
+	end
+end
+
 function GroupActivitiesServer:OnPlayerQuit(args)
 	for _, activity in pairs(self.activities) do
 		if activity:IsPlayerInActivity(args.player) then
@@ -62,23 +70,28 @@ end
 
 function GroupActivitiesServer:OnActivityLeft(args)
 	if self.activities[args.activityId] ~= nil then
-		self.activities[args.activityId]:PlayerQuit(args.player)
+		self.activities[args.activityId]:PlayerQuit(Player.GetById(args.playerId))
 		self:RemoveInactiveActivities()
 		self:BroadcastActivities()
 	end
 end
 
 function GroupActivitiesServer:OnActivityJoined(args)
+	local player = Player.GetById(args.playerId)
 	if self.activities[args.activityId] ~= nil then
-		self.activities[args.activityId]:PlayerJoin(args.player)
+		self.activities[args.activityId]:PlayerJoin(player)
 		self:BroadcastActivities()
+		if player:InVehicle() and not self.activities[args.activityId].allowedVehicles[player:GetVehicle():GetId()] then
+			player:SetPosition(player:GetPosition())
+			Network:Send(player, "Message", "This vehicle is not allowed in this activity")
+		end
 	end
 end
 
 function GroupActivitiesServer:OnPlayerPromoted(args)
-	if activities[args.activityId] ~= nil then
-		activities[args.activityId]:PromotePlayer(args.player)
-		BroadcastActivities()
+	if self.activities[args.activityId] ~= nil then
+		self.activities[args.activityId]:PromotePlayer(Player.GetById(args.player))
+		self:BroadcastActivities()
 	end
 end
 
@@ -103,20 +116,24 @@ function GroupActivitiesServer:OnActivityDeleted(args)
 	end
 end
 
-function GroupActivitiesServer:OnTeleportToLeader(player)
+function GroupActivitiesServer:OnTeleportToLeader(playerId)
+	local player = Player.GetById(playerId)
 	local activity = self:GetJoinedActivity(player)
 
 	if activity ~= nil then
-		player:SetWorld(activity.leader:GetWorld())
-		player:SetPosition(activity.leader:GetPosition())
+		local leader = Player.GetById(activity.leaderId)
+		player:SetWorld(leader:GetWorld())
+		player:SetPosition(leader:GetPosition())
 	end
 end
 
 function GroupActivitiesServer:OnVehicleVelocity(args)
-	if not args.player:InVehicle() then return end
-	if not args.player:GetState() == PlayerState.InVehicle then return end
+	local player = Player.GetById(args.playerId)
+	if not player:InVehicle() then return end
+	if not player:GetState() == PlayerState.InVehicle then return end
 
-	args.player:GetVehicle():SetLinearVelocity(args.velocity)
+	player:GetVehicle():SetLinearVelocity(args.velocity)
+	Network:Send(player, "Message", "Boosting is not allowed in this activity")
 end
 
 GroupActivitiesServer = GroupActivitiesServer()
