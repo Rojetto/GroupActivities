@@ -19,7 +19,7 @@ function AntiBoost:OnRender()
 	local newVelocity = v:GetLinearVelocity()
 	local forward = v:GetAngle() * Vector3(0, 0, -1)
 
-	if (newVelocity - self.lastVelocity):Length() > (forward * 5):Length() then
+	if newVelocity:Length() > self.lastVelocity:Length() and (newVelocity - self.lastVelocity):Length() > (forward * 5):Length() then
 		GroupActivitiesClient:SetVehicleVelocity(self.lastVelocity)
 		self.timer:Restart()
 	else
