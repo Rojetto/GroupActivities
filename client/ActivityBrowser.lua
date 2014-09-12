@@ -78,6 +78,13 @@ function ActivityBrowser:__init()
 	self.playerList:SetWidthAutoRel(1.0)
 	self.playerList:SetPosition(Vector2(0, 255))
 
+	self.vehiclesButton = Button.Create(self.detailsGroup)
+	self.vehiclesButton:SetHeight(25)
+	self.vehiclesButton:SetWidthAutoRel(1.0)
+	self.vehiclesButton:SetPosition(Vector2(0, 360))
+	self.vehiclesButton:SetText("Show allowed vehicles")
+	self.vehiclesButton:Subscribe("Press", self, self.OnVehiclesButtonClick)
+
 	self.arrowLabel = Label.Create(self.detailsButtons)
 	self.arrowLabel:SetText("Show arrow to leader")
 	self.arrowLabel:SizeToContents()
@@ -180,6 +187,7 @@ function ActivityBrowser:SetActive(active)
 		self.window:Hide()
 		if self.editor ~= nil then self.editor:Close() end
 		if self.passwordWindow ~= nil then self.passwordWindow:Close() end
+		if self.vehicleWindow ~= nil then self.vehicleWindow:Close() end
 	end
 end
 
@@ -202,6 +210,7 @@ function ActivityBrowser:ShowDetails(activity)
 	self.descriptionBox:SetHeight(100)
 	self.playerList:SetPlayers({})
 
+	self.vehiclesButton:SetEnabled(false)
 	self.teleportButton:SetEnabled(false)
 	self.joinLeaveButton:SetText("Join")
 	self.joinLeaveButton:SetToolTip("You need to select an activity")
@@ -214,6 +223,7 @@ function ActivityBrowser:ShowDetails(activity)
 		self.playersLabel:SetText("Players: "..(#(activity.members) + 1))
 		self.boostLabel:SetText("Boost allowed: " .. (activity.boost and "yes" or "no"))
 
+		self.vehiclesButton:SetEnabled(true)
 		self.teleportButton:SetEnabled(true)
 
 		if activity.description ~= "" then
@@ -253,6 +263,13 @@ function ActivityBrowser:OnCreateEditButtonClicked()
 		if GroupActivitiesClient:GetJoinedActivity() ~= nil and GroupActivitiesClient:GetJoinedActivity().leader == LocalPlayer then
 			self.editor:SetActivity(GroupActivitiesClient:GetJoinedActivity())
 		end
+	end
+end
+
+function ActivityBrowser:OnVehiclesButtonClick()
+	if self.vehicleWindow == nil or not self.vehicleWindow.active then
+		self.vehicleWindow = AllowedVehiclesEditor(false, nil, nil)
+		self.vehicleWindow:SetAllowedVehicles(self:GetSelectedActivity().allowedVehicles)
 	end
 end
 

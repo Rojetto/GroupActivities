@@ -11,19 +11,21 @@ function AllowedVehiclesEditor:__init(editable, callbackObject, callbackFunction
 	self.checkBoxes = {}
 	self.checkAllBoxes = {}
 
-	self.window:SetSize(Vector2(500, 500))
+	self.window:SetWidth(300)
+	self.window:SetHeightRel(0.8)
 	self.window:SetPositionRel(Vector2(0.5, 0.5) - self.window:GetSizeRel() / 2)
 	self.window:SetTitle(editable and "Edit allowed vehicles" or "Allowed vehicles")
 
 	self.vehicleList = CollapsibleList.Create(self.window)
 	self.vehicleList:SetDock(GwenPosition.Fill)
 
-	self.saveButton = Button.Create(self.window)
-	self.saveButton:SetDock(GwenPosition.Bottom)
-	self.saveButton:SetHeight(25)
-	self.saveButton:SetPadding(Vector2(0, 5), Vector2(0, 0))
-	self.saveButton:SetText("Save")
-	self.saveButton:Subscribe("Press", self, self.OnSaveButtonClick)
+	if editable then
+		self.saveButton = Button.Create(self.window)
+		self.saveButton:SetDock(GwenPosition.Bottom)
+		self.saveButton:SetHeight(25)
+		self.saveButton:SetText("Save")
+		self.saveButton:Subscribe("Press", self, self.OnSaveButtonClick)
+	end
 
 	self:CreateCategories()
 	self:FillList()
