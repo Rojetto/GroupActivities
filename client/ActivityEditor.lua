@@ -73,6 +73,7 @@ function ActivityEditor:__init()
 	self.vehicleButton:SetHeight(25)
 	self.vehicleButton:SetPosition(Vector2(0, 240))
 	self.vehicleButton:SetText("Edit allowed vehicles")
+	self.vehicleButton:Subscribe("Press", self, self.OnVehicleButtonClick)
 
 	self.banButton = Button.Create(self.window)
 	self.banButton:SetWidthAutoRel(1.0)
@@ -168,6 +169,13 @@ function ActivityEditor:OnWhitelistButtonClick()
 	end
 end
 
+function ActivityEditor:OnVehicleButtonClick()
+	if self.vehicleWindow == nil or not self.vehicleWindow.active then
+		self.vehicleWindow = AllowedVehiclesEditor(true, self, self.OnAllowedVehiclesSaved)
+		self.vehicleWindow:SetAllowedVehicles(self.activity.allowedVehicles)
+	end
+end
+
 function ActivityEditor:OnBanButtonClick()
 	if self.banWindow == nil or not self.banWindow.active then
 		self.banWindow = PlayerListEditor(self.activity:GetBannedPlayers(), self, self.OnBanlistSaved)
@@ -209,6 +217,10 @@ function ActivityEditor:OnWhitelistSaved(whitelist, addedPlayers, removedPlayers
 	self.activity:RemoveWhitelistedPlayers(removedPlayers)
 end
 
+function ActivityEditor:OnAllowedVehiclesSaved(allowedVehicles)
+	self.activity.allowedVehicles = allowedVehicles
+end
+
 function ActivityEditor:OnBanlistSaved(banlist, addedPlayers, removedPlayers)
 	self.activity:AddBannedPlayers(addedPlayers)
 	self.activity:RemoveBannedPlayers(removedPlayers)
@@ -222,5 +234,7 @@ end
 function ActivityEditor:Close()
 	if self.promoteWindow ~= nil then self.promoteWindow:Close() end
 	if self.whitelistWindow ~= nil then self.whitelistWindow:Close() end
+	if self.banWindow ~= nil then self.banWindow:Close() end
+	if self.vehicleWindow ~= nil then self.vehicleWindow:Close() end
 	ActiveWindow.Close(self)
 end

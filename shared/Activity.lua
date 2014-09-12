@@ -22,6 +22,9 @@ function Activity:__init(activityId, name, leader)
 	self.bannedSteamIds = {}
 	self.whitelistedSteamIds = {}
 	self.allowedVehicles = {}
+	for id = 1, 92, 1 do
+		self.allowedVehicles[id] = true
+	end
 	self.boost = true
 end
 
