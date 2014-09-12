@@ -4,10 +4,14 @@ function GroupActivitiesClient:__init()
 	self.activities = {}
 	self.browser = nil
 	self.antiBoost = AntiBoost()
+	self.message = ""
+	self.messageTimer = Timer()
 
 	Network:Subscribe("ActivityList", self, self.OnActivityListReceived)
+	Network:Subscribe("Message", self, self.OnMessageReceived)
 	Events:Subscribe("KeyUp", self, self.OnKey)
 	Events:Subscribe("Render", self, self.RenderArrow)
+	Events:Subscribe("Render", self, self.RenderMessage)
 	Events:Subscribe("ModulesLoad", self, self.OnLoad)
 end
 
@@ -35,6 +39,11 @@ function GroupActivitiesClient:OnActivityListReceived(activityList)
 	end
 
 	if self.browser ~= nil then self.browser:SetActivities(self.activities) end
+end
+
+function GroupActivitiesClient:OnMessageReceived(message)
+	self.message = message
+	self.messageTimer:Restart()
 end
 
 function GroupActivitiesClient:OnKey(args)
@@ -108,6 +117,14 @@ function GroupActivitiesClient:RenderArrow()
 		Render:DrawCircle(screenPos, 15, color)
 		Render:FillArea(screenPos + Vector2(20, (-1) * boxHeight / 2), Vector2(boxWidth, boxHeight), Color(0, 0, 0, 150))
 		Render:DrawText(screenPos + Vector2(25, -7), distanceText, Color(255, 255, 255), 20)
+	end
+end
+
+function GroupActivitiesClient:RenderMessage()
+	if self.messageTimer:GetSeconds() < 5 then
+		local textSize = Render:GetTextSize(self.message, 40)
+
+		Render:DrawText((Render.Size / 2) - (textSize / 2) - Vector2(0, Render.Height / 3), self.message, Color(255, 0, 0), 40)
 	end
 end
 

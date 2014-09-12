@@ -1,7 +1,6 @@
 class("AntiBoost")
 
 function AntiBoost:__init()
-	self.timer = Timer()
 	self.inVehicleTimer = Timer()
 	Events:Subscribe("Render", self, self.OnRender)
 	Events:Subscribe("LocalPlayerEnterVehicle", self, self.OnEnterVehicle)
@@ -21,16 +20,8 @@ function AntiBoost:OnRender()
 
 	if newVelocity:Length() > self.lastVelocity:Length() and (newVelocity - self.lastVelocity):Length() > (forward * 5):Length() then
 		GroupActivitiesClient:SetVehicleVelocity(self.lastVelocity)
-		self.timer:Restart()
 	else
 		self.lastVelocity = newVelocity
-	end
-
-	if self.timer:GetSeconds() < 5 then
-		local text = "Boosting is not allowed in this activity"
-		local textSize = Render:GetTextSize(text, 40)
-
-		Render:DrawText((Render.Size / 2) - (textSize / 2) - Vector2(0, Render.Height / 3), text, Color(255, 0, 0), 40)
 	end
 end
 
