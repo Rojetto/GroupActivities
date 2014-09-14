@@ -22,6 +22,7 @@ function ActivityEditor:__init()
 	self.descriptionBox:SetWidthAutoRel(1.0)
 	self.descriptionBox:SetHeight(100)
 	self.descriptionBox:SetPosition(Vector2(0, 30))
+	self.descriptionBox:Subscribe("TextChanged", self, self.OnFormChanged)
 
 	local accessGroup = GroupBox.Create(self.window)
 	accessGroup:SetWidthAutoRel(1.0)
@@ -140,12 +141,24 @@ function ActivityEditor:SetActivity(activity)
 end
 
 function ActivityEditor:OnFormChanged(box)
-	if self.nameBox:GetText() ~= "" and ((self.accessBox:GetSelectedItem():GetText() == Access.Password and self.passwordBox:GetText() ~= "") or self.accessBox:GetSelectedItem():GetText() ~= Access.Password) then
+	if #(self.nameBox:GetText()) == 0 then
+		self.saveButton:SetEnabled(false)
+		self.saveButton:SetToolTip("Activity name missing")
+	elseif #(self.nameBox:GetText()) > 50 then
+		self.saveButton:SetEnabled(false)
+		self.saveButton:SetToolTip("Activity name can't be longer than 50 characters")
+	elseif self.accessBox:GetSelectedItem():GetText() == Access.Password and #(self.passwordBox:GetText()) == 0 then
+		self.saveButton:SetEnabled(false)
+		self.saveButton:SetToolTip("Password missing")
+	elseif self.accessBox:GetSelectedItem():GetText() == Access.Password and #(self.passwordBox:GetText()) > 20 then
+		self.saveButton:SetEnabled(false)
+		self.saveButton:SetToolTip("Password can't be longer than 50 characters")
+	elseif #(self.descriptionBox:GetText()) > 400 then
+		self.saveButton:SetEnabled(false)
+		self.saveButton:SetToolTip("Description can't be longer than 400 characters")
+	else
 		self.saveButton:SetEnabled(true)
 		self.saveButton:SetToolTip("Save your new activity")
-	else
-		self.saveButton:SetEnabled(false)
-		self.saveButton:SetToolTip("Activity name and/or password missing")
 	end
 end
 
