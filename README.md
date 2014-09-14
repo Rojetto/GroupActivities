@@ -24,5 +24,5 @@ Once someone creates an activity they automatically become its leader. Leaders h
 
 ## Configuration ##
 To configure this script, open "GroupActivites" in your server's script folder and go to "client". In "Config.lua" you can configure the following options:
-* Config.ActivityBrowserKey is the hotkey that opens the activity browser
-* Config.OpenOnJoin controls, whether the activity browser should automatically open when a player joins the server
+* "ActivityBrowserKey" is the hotkey that opens the activity browser
+* "OpenOnJoin" controls, whether the activity browser should automatically open when a player joins the server
