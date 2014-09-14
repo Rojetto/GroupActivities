@@ -39,7 +39,7 @@ function Activity:PlayerQuit(player)
 		if self.onLeaveAction == OnLeaveAction.Delete then
 			self.active = false
 		elseif self.onLeaveAction == OnLeaveAction.Promote then
-			if #self.memberIds == 0 then
+			if #(self.memberIds) == 0 then
 				self.active = false
 			else
 				local key, value = next(self.memberIds)

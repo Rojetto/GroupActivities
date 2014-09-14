@@ -188,7 +188,7 @@ function ActivityEditor:OnPromoteButtonClick()
 		self.promoteWindow = PlayerSelector(self, self.OnPlayerPromoted)
 		self.promoteWindow.window:SetTitle("Select player from this activity to promote")
 		local memberList = {}
-		for memberId, _ in pairs(activity.memberIds) do
+		for memberId, _ in pairs(self.activity.memberIds) do
 			memberList[Player.GetById(memberId)] = true
 		end
 		self.promoteWindow.playerList:SetPlayers(memberList)
