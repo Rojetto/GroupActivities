@@ -6,9 +6,12 @@ function GroupActivitiesClient:__init()
 	self.antiBoost = AntiBoost()
 	self.message = ""
 	self.messageTimer = Timer()
+	self.leaderPositionTimer = Timer()
+	self.leaderPosition = Vector3(0, 0, 0)
 
 	Network:Subscribe("ActivityList", self, self.OnActivityListReceived)
 	Network:Subscribe("Message", self, self.OnMessageReceived)
+	Network:Subscribe("LeaderPosition", self, self.OnLeaderPositionReceived)
 	Events:Subscribe("KeyUp", self, self.OnKey)
 	Events:Subscribe("Render", self, self.RenderArrow)
 	Events:Subscribe("Render", self, self.RenderMessage)
@@ -46,6 +49,11 @@ function GroupActivitiesClient:OnMessageReceived(message)
 	self.messageTimer:Restart()
 end
 
+function GroupActivitiesClient:OnLeaderPositionReceived(position)
+	self.leaderPositionTimer:Restart()
+	self.leaderPosition = position
+end
+
 function GroupActivitiesClient:OnKey(args)
 	if args.key == Config.ActivityBrowserKey then
 		self:ShowBrowser()
@@ -76,6 +84,9 @@ function GroupActivitiesClient:RenderArrow()
 	local color = Color(0, 255, 0, 150)
 
 	local leaderPosition = Player.GetById(self:GetJoinedActivity().leaderId):GetPosition()
+	if self.leaderPositionTimer:GetMilliseconds() < 1500 then
+		leaderPosition = self.leaderPosition
+	end
 
 	local base = Camera:GetPosition() + (Camera:GetAngle() * Vector3(0, 1.5, -7))
 	local direction = (leaderPosition - base):Normalized()

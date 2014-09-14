@@ -2,9 +2,11 @@ class("GroupActivitiesServer")
 
 function GroupActivitiesServer:__init()
 	self.activities = {}
+	self.leaderPositionTimer = Timer()
 	Events:Subscribe("ClientModuleLoad", self, self.OnClientModuleLoad)
 	Events:Subscribe("PlayerQuit", self, self.OnPlayerQuit)
 	Events:Subscribe("PlayerEnterVehicle", self, self.OnPlayerEnterVehicle)
+	Events:Subscribe("PostTick", self, self.OnTick)
 	Network:Subscribe("ActivityLeft", self, self.OnActivityLeft)
 	Network:Subscribe("ActivityJoined", self, self.OnActivityJoined)
 	Network:Subscribe("PlayerPromoted", self, self.OnPlayerPromoted)
@@ -24,6 +26,23 @@ end
 
 function GroupActivitiesServer:OnClientModuleLoad(newPlayer)
 	self:BroadcastActivities()
+end
+
+function GroupActivitiesServer:OnTick()
+	if self.leaderPositionTimer:GetMilliseconds() > 1000 then
+		for player in Server:GetPlayers() do
+			if self:GetJoinedActivity(player) ~= nil then
+				local leader = Player.GetById(self:GetJoinedActivity(player).leaderId)
+				local leaderPosition = leader:GetPosition()
+
+				if (leaderPosition - player:GetPosition()):Length() > leader:GetStreamDistance() then
+					Network:Send(player, "LeaderPosition", leaderPosition)
+				end
+			end
+		end
+
+		self.leaderPositionTimer:Restart()
+	end
 end
 
 function GroupActivitiesServer:RemoveInactiveActivities()
