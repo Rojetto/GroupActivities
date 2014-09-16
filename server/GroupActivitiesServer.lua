@@ -100,6 +100,7 @@ function GroupActivitiesServer:OnActivityJoined(args)
 	if self.activities[args.activityId] ~= nil then
 		self.activities[args.activityId]:PlayerJoin(player)
 		self:BroadcastActivities()
+		self:OnTeleportToLeader(args.playerId)
 		if player:InVehicle() and not self.activities[args.activityId].allowedVehicles[player:GetVehicle():GetId()] then
 			player:SetPosition(player:GetPosition())
 			Network:Send(player, "Message", "This vehicle is not allowed in this activity")

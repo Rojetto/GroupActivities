@@ -16,19 +16,38 @@ function GroupActivitiesClient:__init()
 	Events:Subscribe("Render", self, self.RenderArrow)
 	Events:Subscribe("Render", self, self.RenderMessage)
 	Events:Subscribe("ModulesLoad", self, self.OnLoad)
-	Events:Subscribe("ModuleLoad", self, self.AddHelp)
+	Events:Subscribe("ModulesLoad", self, self.AddHelp)
 	Events:Subscribe("ModuleUnload", self, self.RemoveHelp)
 end
 
 function GroupActivitiesClient:AddHelp()
-	print("Adding help thing")
 	Events:Fire("HelpAddItem", {name = "GroupActivities",
 		text = "This script adds functionalities for organizing activities in groups.\n\n" ..
-		"Open the activity browser with [" .. Config.ActivityBrowserKeyName .. "]"})
+		"Open the activity browser with [" .. Config.ActivityBrowserKeyName .. "]\n\n" ..
+		[[Activities are temporary groups of people that do one specific thing together on the server.
+
+Creating an activity has several advantages:
+* People that join the server can immediately see what other people are up to and join them if they like
+* Activity leaders don't have to spam the chat with "roadtrip /tpm 178 peaceful"
+* Activity members can always get displayed where the leader is so that they don't get lost
+* If someone gets lost anyway, they can always teleport to the leader of the activity with one click
+
+Examples of activities include: roadtrips, airtrips, boattrips, skydives, races, airshows or just hanging out together.
+
+Once someone creates an activity they automatically become its leader.
+
+Leaders have several options to customize their activity. They can
+* give the activity a name and description
+* make the activity public, password protected or whitelist-only
+* ban disruptive players from the activity
+* restrict the allowed vehicles if they want a themed trip
+* block boosting in vehicles
+* promote a new leader to take over the activity
+* control what happens when they leave the server. Should the activity be automatically deleted or should a random member be promoted to leader?]]
+	})
 end
 
 function GroupActivitiesClient:RemoveHelp()
-	print("Removing it again")
 	Events:Fire("HelpRemoveItem", {name = "GroupActivities"})
 end
 
