@@ -16,6 +16,20 @@ function GroupActivitiesClient:__init()
 	Events:Subscribe("Render", self, self.RenderArrow)
 	Events:Subscribe("Render", self, self.RenderMessage)
 	Events:Subscribe("ModulesLoad", self, self.OnLoad)
+	Events:Subscribe("ModuleLoad", self, self.AddHelp)
+	Events:Subscribe("ModuleUnload", self, self.RemoveHelp)
+end
+
+function GroupActivitiesClient:AddHelp()
+	print("Adding help thing")
+	Events:Fire("HelpAddItem", {name = "GroupActivities",
+		text = "This script adds functionalities for organizing activities in groups.\n\n" ..
+		"Open the activity browser with [" .. Config.ActivityBrowserKeyName .. "]"})
+end
+
+function GroupActivitiesClient:RemoveHelp()
+	print("Removing it again")
+	Events:Fire("HelpRemoveItem", {name = "GroupActivities"})
 end
 
 function GroupActivitiesClient:OnLoad()

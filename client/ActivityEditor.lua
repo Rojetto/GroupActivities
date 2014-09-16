@@ -6,8 +6,8 @@ function ActivityEditor:__init()
 	self.callback = callback
 	self.activity = Activity(-1, "", LocalPlayer:GetId())
 
-	self.window:SetSize(Vector2(300, 480))
-	self.window:SetMinimumSize(Vector2(300, 480))
+	self.window:SetSize(Vector2(350, 480))
+	self.window:SetMinimumSize(Vector2(350, 480))
 	self.window:SetPositionRel(Vector2(0.5, 0.5) - self.window:GetSizeRel() / 2)
 	self.window:SetTitle("Create a group activity")
 	
