@@ -149,10 +149,12 @@ function ActivityBrowser:SetActivities(activityList)
 	if GroupActivitiesClient:GetJoinedActivity() == nil then
 		self.createEditButton:SetText("Create activity")
 		self.createEditButton:SetToolTip("Create a new activity")
+		self.createEditButton:SetEnabled(true)
 	else
 		if GroupActivitiesClient:GetJoinedActivity().leaderId == LocalPlayer:GetId() then
 			self.createEditButton:SetText("Edit activity")
 			self.createEditButton:SetToolTip("Edit your activity settings")
+			self.createEditButton:SetEnabled(true)
 		else
 			self.createEditButton:SetText("Create activity")
 			self.createEditButton:SetToolTip("You have to leave your activity before you can create a new one")
@@ -245,7 +247,7 @@ function ActivityBrowser:ShowDetails(activity)
 			if activity.access == Access.Whitelist and not activity:IsPlayerWhitelisted(LocalPlayer) then
 				self.joinLeaveButton:SetToolTip("You are not on the whitelist")
 			elseif activity:IsPlayerBanned(LocalPlayer) then
-				self.joinLeaveButton:SetToolTip("You are banned from this ativity")
+				self.joinLeaveButton:SetToolTip("You are banned from this activity")
 			elseif GroupActivitiesClient:GetJoinedActivity() ~= nil then
 				self.joinLeaveButton:SetToolTip("You have to leave the activity you are currently in first")
 			else

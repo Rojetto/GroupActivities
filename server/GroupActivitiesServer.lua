@@ -16,9 +16,9 @@ function GroupActivitiesServer:__init()
 	Network:Subscribe("VehicleVelocity", self, self.OnVehicleVelocity)
 end
 
-function GroupActivitiesServer:SteamIdToPlayer(steamId)
+function SteamIdToPlayer(steamId)
 	for player in Server:GetPlayers() do
-		if steamId == player:GetSteamId() then
+		if steamId == player:GetSteamId().id then
 			return player
 		end
 	end
@@ -35,7 +35,7 @@ function GroupActivitiesServer:OnTick()
 				local leader = Player.GetById(self:GetJoinedActivity(player).leaderId)
 				local leaderPosition = leader:GetPosition()
 
-				if (leaderPosition - player:GetPosition()):Length() > leader:GetStreamDistance() then
+				if (leaderPosition - player:GetPosition()):Length() > 500 then
 					Network:Send(player, "LeaderPosition", leaderPosition)
 				end
 			end
@@ -110,7 +110,7 @@ end
 
 function GroupActivitiesServer:OnPlayerPromoted(args)
 	if self.activities[args.activityId] ~= nil then
-		self.activities[args.activityId]:PromotePlayer(Player.GetById(args.player))
+		self.activities[args.activityId]:PromotePlayer(Player.GetById(args.playerId))
 		self:BroadcastActivities()
 	end
 end
@@ -124,6 +124,9 @@ function GroupActivitiesServer:OnActivitySaved(table)
 	end
 	if newActivity.id == -1 then newActivity.id = i end
 	self.activities[newActivity.id] = newActivity
+	for player, _ in pairs(self.activities[newActivity.id]:GetBannedPlayers()) do
+		self.activities[newActivity.id]:PlayerQuit(player)
+	end
 	self:RemoveInactiveActivities()
 	self:BroadcastActivities()
 end

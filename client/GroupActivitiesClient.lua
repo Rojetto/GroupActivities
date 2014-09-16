@@ -57,7 +57,7 @@ function GroupActivitiesClient:OnLoad()
 	end
 end
 
-function GroupActivitiesClient:SteamIdToPlayer(steamId)
+function SteamIdToPlayer(steamId)
 	if steamId == LocalPlayer:GetSteamId().id then return LocalPlayer end
 
 	for player in Client:GetPlayers() do
@@ -120,6 +120,7 @@ function GroupActivitiesClient:RenderArrow()
 	if self.leaderPositionTimer:GetMilliseconds() < 1500 then
 		leaderPosition = self.leaderPosition
 	end
+	leaderPosition = leaderPosition + Vector3(0, 2.5, 0)
 
 	local base = Camera:GetPosition() + (Camera:GetAngle() * Vector3(0, 1.5, -7))
 	local direction = (leaderPosition - base):Normalized()
@@ -158,7 +159,7 @@ function GroupActivitiesClient:RenderArrow()
 
 	local screenPos, onScreen = Render:WorldToScreen(leaderPosition)
 	if onScreen then
-		Render:DrawCircle(screenPos, 15, color)
+		Render:FillCircle(screenPos, 10, color)
 		Render:FillArea(screenPos + Vector2(20, (-1) * boxHeight / 2), Vector2(boxWidth, boxHeight), Color(0, 0, 0, 150))
 		Render:DrawText(screenPos + Vector2(25, -7), distanceText, Color(255, 255, 255), 20)
 	end
@@ -181,7 +182,7 @@ function GroupActivitiesClient:LeaveActivity(activity)
 end
 
 function GroupActivitiesClient:PromotePlayer(activity, player)
-	Network:Send("PlayerPromoted", {activityId = activity.id, playerId = player})
+	Network:Send("PlayerPromoted", {activityId = activity.id, playerId = player:GetId()})
 end
 
 function GroupActivitiesClient:SaveActivity(activity)

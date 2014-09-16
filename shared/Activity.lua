@@ -80,7 +80,7 @@ function Activity:GetWhitelistedPlayers()
 	local whitelist = {}
 
 	for steamId, _ in pairs(self.whitelistedSteamIds) do
-		local player = GroupActivitiesClient:SteamIdToPlayer(steamId)
+		local player = SteamIdToPlayer(steamId)
 		if player ~= nil then whitelist[player] = true end
 	end
 
@@ -91,7 +91,7 @@ function Activity:GetBannedPlayers()
 	local banlist = {}
 
 	for steamId, _ in pairs(self.bannedSteamIds) do
-		local player = GroupActivitiesClient:SteamIdToPlayer(steamId)
+		local player = SteamIdToPlayer(steamId)
 		if player ~= nil then banlist[player] = true end
 	end
 
