@@ -45,6 +45,7 @@ function Activity:PlayerQuit(player)
 				local key, value = next(self.memberIds)
 				self.leaderId = key
 				self.memberIds[key] = nil
+				Chat:Send(Player.GetById(key), 'You were promoted to the leader of "' .. self.name .. '"', Color(0, 255, 0))
 			end
 		end
 	end

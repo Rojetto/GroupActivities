@@ -88,8 +88,10 @@ function GroupActivitiesServer:OnPlayerQuit(args)
 end
 
 function GroupActivitiesServer:OnActivityLeft(args)
+	local player = Player.GetById(args.playerId)
 	if self.activities[args.activityId] ~= nil then
-		self.activities[args.activityId]:PlayerQuit(Player.GetById(args.playerId))
+		self.activities[args.activityId]:PlayerQuit(player)
+		Chat:Send(player, 'You have left "' .. self.activities[args.activityId].name .. '"', Color(0, 255, 0))
 		self:RemoveInactiveActivities()
 		self:BroadcastActivities()
 	end
@@ -99,6 +101,7 @@ function GroupActivitiesServer:OnActivityJoined(args)
 	local player = Player.GetById(args.playerId)
 	if self.activities[args.activityId] ~= nil then
 		self.activities[args.activityId]:PlayerJoin(player)
+		Chat:Send(player, 'You have joined "' .. self.activities[args.activityId].name .. '"', Color(0, 255, 0))
 		self:BroadcastActivities()
 		self:OnTeleportToLeader(args.playerId)
 		if player:InVehicle() and not self.activities[args.activityId].allowedVehicles[player:GetVehicle():GetId()] then
@@ -109,8 +112,10 @@ function GroupActivitiesServer:OnActivityJoined(args)
 end
 
 function GroupActivitiesServer:OnPlayerPromoted(args)
+	local player = Player.GetById(args.playerId)
 	if self.activities[args.activityId] ~= nil then
-		self.activities[args.activityId]:PromotePlayer(Player.GetById(args.playerId))
+		self.activities[args.activityId]:PromotePlayer(player)
+		Chat:Send(player, 'You were promoted to the leader of "' .. self.activities[args.activityId].name .. '"', Color(0, 255, 0))
 		self:BroadcastActivities()
 	end
 end
@@ -124,8 +129,10 @@ function GroupActivitiesServer:OnActivitySaved(table)
 	end
 	if newActivity.id == -1 then newActivity.id = i end
 	self.activities[newActivity.id] = newActivity
+	Chat:Send(Player.GetById(self.activities[newActivity.id].leaderId), "The activity has been saved", Color(0, 255, 0))
 	for player, _ in pairs(self.activities[newActivity.id]:GetBannedPlayers()) do
 		self.activities[newActivity.id]:PlayerQuit(player)
+		Chat:Send(player, 'You\'ve been banned from "' .. self.activities[newActivity.id].name .. '"', Color(255, 0, 0))
 	end
 	self:RemoveInactiveActivities()
 	self:BroadcastActivities()
@@ -134,6 +141,7 @@ end
 function GroupActivitiesServer:OnActivityDeleted(args)
 	if self.activities[args.activityId] ~= nil then
 		self.activities[args.activityId].active = false
+		Chat:Send(Player.GetById(self.activities[args.activityId].leaderId), "The activity has been deleted", Color(0, 255, 0))
 		self:RemoveInactiveActivities()
 		self:BroadcastActivities()
 	end
