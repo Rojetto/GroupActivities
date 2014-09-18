@@ -35,7 +35,7 @@ function GroupActivitiesServer:OnTick()
 				local leader = Player.GetById(self:GetJoinedActivity(player).leaderId)
 				local leaderPosition = leader:GetPosition()
 
-				if (leaderPosition - player:GetPosition()):Length() > 500 then
+				if (leaderPosition - player:GetPosition()):Length() > Config:GetValue("Streamer", "StreamDistance") then
 					Network:Send(player, "LeaderPosition", leaderPosition)
 				end
 			end
