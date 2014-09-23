@@ -177,15 +177,15 @@ end
 
 function GroupActivitiesClient:OnChat(args)
 	local otherPlayer = args.player
-	if self.browser == nil or not self.browser:IsActivityChatEnabled() then return true end
 	if otherPlayer == nil then return true end
 	local myActivity = self:GetJoinedActivity(LocalPlayer)
 	local otherActivity = self:GetJoinedActivity(otherPlayer)
 
-	print(tostring(myActivity) .. " " .. tostring(otherActivity))
-
-	if (myActivity == nil and otherActivity ~= nil) or (myActivity ~= nil and otherActivity == nil) then
+	if myActivity == nil and otherActivity ~= nil then
 		return false
+	end
+	if myActivity ~= nil and otherActivity == nil then
+		return (self.browser == nil or self.browser:IsActivityChatEnabled())
 	end
 	if myActivity == nil and otherActivity == nil then
 		return true
