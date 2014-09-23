@@ -36,7 +36,7 @@ function ActivityBrowser:__init()
 	self.detailsButtons = BaseWindow.Create(self.details)
 	self.detailsButtons:SetDock(GwenPosition.Bottom)
 	self.detailsButtons:SetWidthAutoRel(1.0)
-	self.detailsButtons:SetHeight(85)
+	self.detailsButtons:SetHeight(115)
 	self.detailsButtons:SetPadding(Vector2(0, 5), Vector2(0, 0))
 
 	self.nameLabel = Label.Create(self.detailsGroup)
@@ -95,15 +95,26 @@ function ActivityBrowser:__init()
 	self.arrowBox:SetPosition(Vector2(150, 5))
 	self.arrowBox:SetChecked(true)
 
+	self.chatLabel = Label.Create(self.detailsButtons)
+	self.chatLabel:SetPosition(Vector2(0, 30))
+	self.chatLabel:SetText("Only show activity chat")
+	self.chatLabel:SizeToContents()
+	self.chatLabel:SetHeight(25)
+	self.chatLabel:SetAlignment(GwenPosition.CenterV)
+
+	self.chatBox = CheckBox.Create(self.detailsButtons)
+	self.chatBox:SetPosition(Vector2(150, 35))
+	self.chatBox:SetChecked(true)
+
 	self.teleportButton = Button.Create(self.detailsButtons)
-	self.teleportButton:SetPosition(Vector2(0, 30))
+	self.teleportButton:SetPosition(Vector2(0, 60))
 	self.teleportButton:SetHeight(25)
 	self.teleportButton:SetWidthAutoRel(1.0)
 	self.teleportButton:SetText("Teleport to leader")
 	self.teleportButton:Subscribe("Press", self, self.OnTeleportButtonClick)
 
 	self.joinLeaveButton = Button.Create(self.detailsButtons)
-	self.joinLeaveButton:SetPosition(Vector2(0, 60))
+	self.joinLeaveButton:SetPosition(Vector2(0, 90))
 	self.joinLeaveButton:SetHeight(25)
 	self.joinLeaveButton:SetWidthAutoRel(1.0)
 	self.joinLeaveButton:Subscribe("Press", self, self.OnJoinLeaveButtonClicked)
@@ -134,7 +145,7 @@ function ActivityBrowser:SetActivities(activityList)
 		row:SetCellText(3, activity.access)
 		row:SetCellText(4, tostring(#(activity.memberIds) + 1))
 
-		if GroupActivitiesClient:GetJoinedActivity() ~= nil and id == GroupActivitiesClient:GetJoinedActivity().id then
+		if GroupActivitiesClient:GetJoinedActivity(LocalPlayer) ~= nil and id == GroupActivitiesClient:GetJoinedActivity(LocalPlayer).id then
 			row:SetTextColor(Color(0, 255, 0))
 			selectedRow = row
 		end
@@ -146,12 +157,12 @@ function ActivityBrowser:SetActivities(activityList)
 		self:ShowDetails(nil)
 	end
 
-	if GroupActivitiesClient:GetJoinedActivity() == nil then
+	if GroupActivitiesClient:GetJoinedActivity(LocalPlayer) == nil then
 		self.createEditButton:SetText("Create activity")
 		self.createEditButton:SetToolTip("Create a new activity")
 		self.createEditButton:SetEnabled(true)
 	else
-		if GroupActivitiesClient:GetJoinedActivity().leaderId == LocalPlayer:GetId() then
+		if GroupActivitiesClient:GetJoinedActivity(LocalPlayer).leaderId == LocalPlayer:GetId() then
 			self.createEditButton:SetText("Edit activity")
 			self.createEditButton:SetToolTip("Edit your activity settings")
 			self.createEditButton:SetEnabled(true)
@@ -196,6 +207,10 @@ end
 function ActivityBrowser:OnRowSelected()
 	local activity = self:GetSelectedActivity()
 	self:ShowDetails(activity)
+end
+
+function ActivityBrowser:IsActivityChatEnabled()
+	return self.chatBox:GetChecked()
 end
 
 function ActivityBrowser:IsArrowEnabled()
@@ -243,12 +258,12 @@ function ActivityBrowser:ShowDetails(activity)
 		end
 		self.playerList:SetPlayers(memberList)
 
-		if GroupActivitiesClient:GetJoinedActivity() == nil or GroupActivitiesClient:GetJoinedActivity().id ~= activity.id then
+		if GroupActivitiesClient:GetJoinedActivity(LocalPlayer) == nil or GroupActivitiesClient:GetJoinedActivity(LocalPlayer).id ~= activity.id then
 			if activity.access == Access.Whitelist and not activity:IsPlayerWhitelisted(LocalPlayer) then
 				self.joinLeaveButton:SetToolTip("You are not on the whitelist")
 			elseif activity:IsPlayerBanned(LocalPlayer) then
 				self.joinLeaveButton:SetToolTip("You are banned from this activity")
-			elseif GroupActivitiesClient:GetJoinedActivity() ~= nil then
+			elseif GroupActivitiesClient:GetJoinedActivity(LocalPlayer) ~= nil then
 				self.joinLeaveButton:SetToolTip("You have to leave the activity you are currently in first")
 			else
 				self.joinLeaveButton:SetEnabled(true)
@@ -266,8 +281,8 @@ end
 function ActivityBrowser:OnCreateEditButtonClicked()
 	if self.editor == nil or not self.editor.active then
 		self.editor = ActivityEditor()
-		if GroupActivitiesClient:GetJoinedActivity() ~= nil and GroupActivitiesClient:GetJoinedActivity().leaderId == LocalPlayer:GetId() then
-			self.editor:SetActivity(GroupActivitiesClient:GetJoinedActivity())
+		if GroupActivitiesClient:GetJoinedActivity(LocalPlayer) ~= nil and GroupActivitiesClient:GetJoinedActivity(LocalPlayer).leaderId == LocalPlayer:GetId() then
+			self.editor:SetActivity(GroupActivitiesClient:GetJoinedActivity(LocalPlayer))
 		end
 	end
 end
@@ -285,7 +300,7 @@ function ActivityBrowser:OnTeleportButtonClick()
 end
 
 function ActivityBrowser:OnJoinLeaveButtonClicked()
-	if GroupActivitiesClient:GetJoinedActivity() == self:GetSelectedActivity() then
+	if GroupActivitiesClient:GetJoinedActivity(LocalPlayer) == self:GetSelectedActivity() then
 		GroupActivitiesClient:LeaveActivity(self:GetSelectedActivity())
 	else
 		if (self:GetSelectedActivity().access ~= Access.Password) then

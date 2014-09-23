@@ -7,8 +7,8 @@ function AntiBoost:__init()
 end
 
 function AntiBoost:OnRender()
-	if GroupActivitiesClient:GetJoinedActivity() == nil then return end
-	if GroupActivitiesClient:GetJoinedActivity().boost then return end
+	if GroupActivitiesClient:GetJoinedActivity(LocalPlayer) == nil then return end
+	if GroupActivitiesClient:GetJoinedActivity(LocalPlayer).boost then return end
 	if not LocalPlayer:InVehicle() then return end
 	if not LocalPlayer:GetState() == PlayerState.InVehicle then return end
 	if self.inVehicleTimer:GetSeconds() < 1 then return end
