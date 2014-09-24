@@ -29,35 +29,53 @@ function Activity:__init(activityId, name, leaderId)
 end
 
 function Activity:PlayerJoin(player)
-	self.memberIds[player:GetId()] = true
+	local playerId = player:GetId()
+	if not self:IsPlayerInActivity(player) then
+		self.memberIds[player:GetId()] = true
+		Chat:Send(player, 'You have joined "' .. self.name .. '"', Color(0, 255, 0))
+	end
 end
 
 function Activity:PlayerQuit(player)
 	local playerId = player:GetId()
-	self.memberIds[playerId] = nil
-	if self.leaderId == playerId then
-		if self.onLeaveAction == OnLeaveAction.Delete then
-			self.active = false
-		elseif self.onLeaveAction == OnLeaveAction.Promote then
-			if #(self.memberIds) == 0 then
+	if self:IsPlayerInActivity(player) then
+		self.memberIds[playerId] = nil
+		if self.leaderId == playerId then
+			if self.onLeaveAction == OnLeaveAction.Delete then
 				self.active = false
-			else
-				local key, value = next(self.memberIds)
-				self.leaderId = key
-				self.memberIds[key] = nil
-				Chat:Send(Player.GetById(key), 'You were promoted to the leader of "' .. self.name .. '"', Color(0, 255, 0))
+			elseif self.onLeaveAction == OnLeaveAction.Promote then
+				if #(self.memberIds) == 0 then
+					self.active = false
+				else
+					local key, value = next(self.memberIds)
+					self.leaderId = key
+					self.memberIds[key] = nil
+					Chat:Send(Player.GetById(key), 'You were promoted to the leader of "' .. self.name .. '"', Color(0, 255, 0))
+				end
 			end
 		end
+		Chat:Send(player, 'You have left "' .. self.name .. '"', Color(0, 255, 0))
 	end
 end
 
 function Activity:PromotePlayer(player)
 	local playerId = player:GetId()
-	if self.memberIds[playerId] == true then
+	if self:IsPlayerInActivity(player) then
 		self.memberIds[self.leaderId] = true
 		self.memberIds[playerId] = nil
 		self.leaderId = playerId
+		Chat:Send(player, 'You were promoted to the leader of "' .. self.name .. '"', Color(0, 255, 0))
 	end
+end
+
+function Activity:Delete()
+	for memberId, _ in pairs(self.memberIds) do
+		local player = Player.GetById(memberId)
+		Chat:Send(player, "The activity has been deleted", Color(0, 255, 0))
+		self:PlayerQuit(player)
+	end
+	Chat:Send(Player.GetById(self.leaderId), "The activity has been deleted", Color(0, 255, 0))
+	self:PlayerQuit(Player.GetById(self.leaderId))
 end
 
 function Activity:IsVehicleAllowed(vehicleId)

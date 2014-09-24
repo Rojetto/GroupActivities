@@ -91,7 +91,6 @@ function GroupActivitiesServer:OnActivityLeft(args)
 	local player = Player.GetById(args.playerId)
 	if self.activities[args.activityId] ~= nil then
 		self.activities[args.activityId]:PlayerQuit(player)
-		Chat:Send(player, 'You have left "' .. self.activities[args.activityId].name .. '"', Color(0, 255, 0))
 		self:RemoveInactiveActivities()
 		self:BroadcastActivities()
 	end
@@ -101,7 +100,6 @@ function GroupActivitiesServer:OnActivityJoined(args)
 	local player = Player.GetById(args.playerId)
 	if self.activities[args.activityId] ~= nil then
 		self.activities[args.activityId]:PlayerJoin(player)
-		Chat:Send(player, 'You have joined "' .. self.activities[args.activityId].name .. '"', Color(0, 255, 0))
 		self:BroadcastActivities()
 		self:OnTeleportToLeader(args.playerId)
 		if player:InVehicle() and not self.activities[args.activityId].allowedVehicles[player:GetVehicle():GetId()] then
@@ -115,7 +113,6 @@ function GroupActivitiesServer:OnPlayerPromoted(args)
 	local player = Player.GetById(args.playerId)
 	if self.activities[args.activityId] ~= nil then
 		self.activities[args.activityId]:PromotePlayer(player)
-		Chat:Send(player, 'You were promoted to the leader of "' .. self.activities[args.activityId].name .. '"', Color(0, 255, 0))
 		self:BroadcastActivities()
 	end
 end
@@ -140,8 +137,7 @@ end
 
 function GroupActivitiesServer:OnActivityDeleted(args)
 	if self.activities[args.activityId] ~= nil then
-		self.activities[args.activityId].active = false
-		Chat:Send(Player.GetById(self.activities[args.activityId].leaderId), "The activity has been deleted", Color(0, 255, 0))
+		self.activities[args.activityId]:Delete()
 		self:RemoveInactiveActivities()
 		self:BroadcastActivities()
 	end
