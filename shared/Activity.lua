@@ -33,6 +33,7 @@ function Activity:PlayerJoin(player)
 	if not self:IsPlayerInActivity(player) then
 		self.memberIds[player:GetId()] = true
 		Chat:Send(player, 'You have joined "' .. self.name .. '"', Color(0, 255, 0))
+		Chat:Send(player, "You're now talking in the activity chat. Leave the activity to return to global chat.", Color(255, 255, 0))
 	end
 end
 
@@ -55,6 +56,7 @@ function Activity:PlayerQuit(player)
 			end
 		end
 		Chat:Send(player, 'You have left "' .. self.name .. '"', Color(0, 255, 0))
+		Chat:Send(player, "You're now talking in the global chat.", Color(255, 255, 0))
 	end
 end
 
