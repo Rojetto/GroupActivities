@@ -9,6 +9,13 @@ function ChatManagerServer:OnPlayerChat(args)
 		if not self:GetsMessageSent(args.player, receiver) then
 			Network:Send(receiver, "ChatIgnore")
 		end
+		local senderActivity = GroupActivitiesServer:GetJoinedActivity(args.player)
+		local receiverActivity = GroupActivitiesServer:GetJoinedActivity(receiver)
+
+		if senderActivity ~= nil and receiverActivity ~= nil and senderActivity.id == receiverActivity.id and senderActivity.leaderId == args.player:GetId() then
+			Network:Send(receiver, "ChatIgnore")
+			Chat:Send(receiver, args.player:GetName() .. ": " .. args.text, args.player:GetColor())
+		end
 	end
 
 	return true
