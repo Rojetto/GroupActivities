@@ -15,7 +15,6 @@ function GroupActivitiesClient:__init()
 	Events:Subscribe("KeyUp", self, self.OnKey)
 	Events:Subscribe("Render", self, self.RenderArrow)
 	Events:Subscribe("Render", self, self.RenderMessage)
-	Events:Subscribe("PlayerChat", self, self.OnChat)
 	Events:Subscribe("ModulesLoad", self, self.OnLoad)
 	Events:Subscribe("ModulesLoad", self, self.AddHelp)
 	Events:Subscribe("ModuleUnload", self, self.RemoveHelp)
@@ -172,28 +171,6 @@ function GroupActivitiesClient:RenderMessage()
 		local textSize = Render:GetTextSize(self.message, 40)
 
 		Render:DrawText((Render.Size / 2) - (textSize / 2) - Vector2(0, Render.Height / 3), self.message, Color(255, 0, 0), 40)
-	end
-end
-
-function GroupActivitiesClient:OnChat(args)
-	local otherPlayer = args.player
-	if otherPlayer == nil then return true end
-	local myActivity = self:GetJoinedActivity(LocalPlayer)
-	local otherActivity = self:GetJoinedActivity(otherPlayer)
-
-	if myActivity == nil and otherActivity ~= nil then
-		return false
-	end
-	if myActivity ~= nil and otherActivity == nil then
-		return (self.browser == nil or self.browser:IsActivityChatEnabled())
-	end
-	if myActivity == nil and otherActivity == nil then
-		return true
-	end
-	if myActivity.id == otherActivity.id then
-		return true
-	else
-		return false
 	end
 end
 
