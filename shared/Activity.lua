@@ -41,12 +41,12 @@ function Activity:PlayerQuit(player)
 	local playerId = player:GetId()
 	if self:IsPlayerInActivity(player) then
 		self.memberIds[playerId] = nil
-		if self.leaderId == playerId then
+		if self.leaderId == playerId and self.active then
 			if self.onLeaveAction == OnLeaveAction.Delete then
-				self.active = false
+				self:Delete()
 			elseif self.onLeaveAction == OnLeaveAction.Promote then
 				if #(self.memberIds) == 0 then
-					self.active = false
+					self:Delete()
 				else
 					local key, value = next(self.memberIds)
 					self.leaderId = key
@@ -63,7 +63,7 @@ end
 function Activity:PromotePlayer(player)
 	local playerId = player:GetId()
 	if self:IsPlayerInActivity(player) then
-		self.memberIds[self.leaderId] = true
+		if self.leaderId ~= nil then self.memberIds[self.leaderId] = true end
 		self.memberIds[playerId] = nil
 		self.leaderId = playerId
 		Chat:Send(player, 'You were promoted to the leader of "' .. self.name .. '"', Color(0, 255, 0))
@@ -77,7 +77,7 @@ function Activity:Delete()
 		self:PlayerQuit(player)
 	end
 	Chat:Send(Player.GetById(self.leaderId), "The activity has been deleted", Color(0, 255, 0))
-	self:PlayerQuit(Player.GetById(self.leaderId))
+	self.active = false
 end
 
 function Activity:IsVehicleAllowed(vehicleId)

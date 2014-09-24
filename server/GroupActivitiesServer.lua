@@ -124,7 +124,14 @@ function GroupActivitiesServer:OnActivitySaved(table)
 	while self.activities[i] ~= nil do
 		i = i + 1
 	end
-	if newActivity.id == -1 then newActivity.id = i end
+	if newActivity.id == -1 then
+		newActivity.id = i
+		--Ugly hack to send the right messages to the leader
+		local leader = Player.GetById(newActivity.leaderId)
+		newActivity.leaderId = nil
+		newActivity:PlayerJoin(leader)
+		newActivity:PromotePlayer(leader)
+	end
 	self.activities[newActivity.id] = newActivity
 	Chat:Send(Player.GetById(self.activities[newActivity.id].leaderId), "The activity has been saved", Color(0, 255, 0))
 	for player, _ in pairs(self.activities[newActivity.id]:GetBannedPlayers()) do
