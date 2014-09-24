@@ -9,7 +9,6 @@ end
 
 function ChatManagerClient:OnChatIgnore()
 	self.ignoreNextMessage = true
-	print("Ignore the next message")
 end
 
 function ChatManagerClient:OnPlayerChat(args)
