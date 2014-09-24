@@ -13,8 +13,10 @@ function ChatManagerServer:OnPlayerChat(args)
 		local receiverActivity = GroupActivitiesServer:GetJoinedActivity(receiver)
 
 		if senderActivity ~= nil and receiverActivity ~= nil and senderActivity.id == receiverActivity.id and senderActivity.leaderId == args.player:GetId() then
-			Network:Send(receiver, "ChatIgnore")
-			Chat:Send(receiver, "[Leader] " .. args.player:GetName() .. ": " .. args.text, Color(153, 102, 204))
+			if args.text:sub(1, 1) ~= "/" then
+				Network:Send(receiver, "ChatIgnore")
+				Chat:Send(receiver, "[Leader] " .. args.player:GetName() .. ": " .. args.text, Color(153, 102, 204))
+			end
 		end
 	end
 

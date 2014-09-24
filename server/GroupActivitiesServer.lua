@@ -7,6 +7,7 @@ function GroupActivitiesServer:__init()
 	Events:Subscribe("PlayerQuit", self, self.OnPlayerQuit)
 	Events:Subscribe("PlayerEnterVehicle", self, self.OnPlayerEnterVehicle)
 	Events:Subscribe("PostTick", self, self.OnTick)
+	Events:Subscribe("PlayerChat", self, self.OnStaffCommand)
 	Network:Subscribe("ActivityLeft", self, self.OnActivityLeft)
 	Network:Subscribe("ActivityJoined", self, self.OnActivityJoined)
 	Network:Subscribe("PlayerPromoted", self, self.OnPlayerPromoted)
@@ -42,6 +43,45 @@ function GroupActivitiesServer:OnTick()
 		end
 
 		self.leaderPositionTimer:Restart()
+	end
+end
+
+function GroupActivitiesServer:OnStaffCommand(args)
+	local arguments = {}
+	for argument in args.text:gmatch("%S+") do
+		table.insert(arguments, argument)
+	end
+	if arguments[1] == "/deleteactivity" then
+		local approved = false
+		for _, steamIdString in pairs(Staff) do
+			if tostring(args.player:GetSteamId()) == steamIdString then
+				approved = true
+				break
+			end
+		end
+
+		if not approved then
+			Chat:Send(args.player, "You don't have permission to use this command", Color(255, 0, 0))
+			return false
+		end
+		if #arguments == 2 then
+			local id = tonumber(arguments[2])
+			if id == nil then
+				Chat:Send(args.player, "The id has to be a number", Color(255, 0, 0))
+				return false
+			end
+			local activity = self.activities[id]
+			if activity == nil then
+				Chat:Send(args.player, "There is no activity with id " .. tostring(id), Color(255, 0, 0))
+				return false
+			end
+			activity:Delete()
+			Chat:Send(args.player, "The activity with id " .. tostring(id) .. " has been deleted", Color(0, 255, 0))
+		else
+			Chat:Send(args.player, "Format: /deleteactivity [id]", Color(255, 0, 0))
+			return false
+		end
+		return false
 	end
 end
 

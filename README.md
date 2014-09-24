@@ -24,7 +24,9 @@ Once someone creates an activity they automatically become its leader. Leaders h
 * control what happens when they leave the server. Should the activity be automatically deleted or should a random member be promoted to leader?
 
 ## Configuration ##
-To configure this script, open "GroupActivites" in your server's script folder and go to "client". In "Config.lua" you can configure the following options:
+Open "GroupActivities/client/Config.lua" to configure the following options:
 * "ActivityBrowserKey" is the hotkey that opens the activity browser
 * "ActivityBrowserKeyName" is the name of the activity browser hotkey that gets displayed in the help menu
 * "OpenOnJoin" controls, whether the activity browser should automatically open when a player joins the server
+
+If you want to use /deleteactivity to delete activities that break the rules, you have to add staff members to "GroupActivities/server/Staff.lua".
