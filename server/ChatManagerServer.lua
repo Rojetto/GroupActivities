@@ -5,15 +5,15 @@ function ChatManagerServer:__init()
 end
 
 function ChatManagerServer:OnPlayerChat(args)
-	for receiver in Server:GetPlayers() do
-		if not self:GetsMessageSent(args.player, receiver) then
-			Network:Send(receiver, "ChatIgnore")
-		end
-		local senderActivity = GroupActivitiesServer:GetJoinedActivity(args.player)
-		local receiverActivity = GroupActivitiesServer:GetJoinedActivity(receiver)
+	if args.text:sub(1, 1) ~= "/" then
+		for receiver in Server:GetPlayers() do
+			if not self:GetsMessageSent(args.player, receiver) then
+				Network:Send(receiver, "ChatIgnore")
+			end
+			local senderActivity = GroupActivitiesServer:GetJoinedActivity(args.player)
+			local receiverActivity = GroupActivitiesServer:GetJoinedActivity(receiver)
 
-		if senderActivity ~= nil and receiverActivity ~= nil and senderActivity.id == receiverActivity.id and senderActivity.leaderId == args.player:GetId() then
-			if args.text:sub(1, 1) ~= "/" then
+			if senderActivity ~= nil and receiverActivity ~= nil and senderActivity.id == receiverActivity.id and senderActivity.leaderId == args.player:GetId() then
 				Network:Send(receiver, "ChatIgnore")
 				Chat:Send(receiver, "[Leader] " .. args.player:GetName() .. ": " .. args.text, Color(153, 102, 204))
 			end
