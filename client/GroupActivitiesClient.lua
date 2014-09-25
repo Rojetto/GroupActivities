@@ -23,7 +23,7 @@ end
 function GroupActivitiesClient:AddHelp()
 	Events:Fire("HelpAddItem", {name = "GroupActivities",
 		text = "This script adds functionalities for organizing activities in groups.\n\n" ..
-		"Open the activity browser with [" .. Config.ActivityBrowserKeyName .. "]\n\n" ..
+		"Open the activity browser with [" .. GroupActivitiesConfig.ActivityBrowserKeyName .. "]\n\n" ..
 		[[Activities are temporary groups of people that do one specific thing together on the server.
 
 Creating an activity has several advantages:
@@ -53,7 +53,7 @@ function GroupActivitiesClient:RemoveHelp()
 end
 
 function GroupActivitiesClient:OnLoad()
-	if Config.OpenOnJoin then
+	if GroupActivitiesConfig.OpenOnJoin then
 		self:ShowBrowser()
 	end
 end
@@ -89,7 +89,7 @@ function GroupActivitiesClient:OnLeaderPositionReceived(position)
 end
 
 function GroupActivitiesClient:OnKey(args)
-	if args.key == Config.ActivityBrowserKey then
+	if args.key == GroupActivitiesConfig.ActivityBrowserKey then
 		self:ShowBrowser()
 	end
 end

@@ -25,6 +25,16 @@ function SteamIdToPlayer(steamId)
 	end
 end
 
+function GroupActivitiesServer:IsPlayerStaff(player)
+	for _, steamIdString in pairs(GroupActivitiesConfig.Staff) do
+		if tostring(player:GetSteamId()) == steamIdString then
+			return true
+		end
+	end
+
+	return false
+end
+
 function GroupActivitiesServer:OnClientModuleLoad(newPlayer)
 	self:BroadcastActivities()
 end
@@ -52,15 +62,7 @@ function GroupActivitiesServer:OnStaffCommand(args)
 		table.insert(arguments, argument)
 	end
 	if arguments[1] == "/deleteactivity" then
-		local approved = false
-		for _, steamIdString in pairs(Staff) do
-			if tostring(args.player:GetSteamId()) == steamIdString then
-				approved = true
-				break
-			end
-		end
-
-		if not approved then
+		if not self:IsPlayerStaff(args.player) then
 			Chat:Send(args.player, "You don't have permission to use this command", Color(255, 0, 0))
 			return false
 		end
