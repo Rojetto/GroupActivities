@@ -115,7 +115,7 @@ function GroupActivitiesClient:RenderArrow()
 	if self.browser == nil or not self.browser:IsArrowEnabled() or self:GetJoinedActivity(LocalPlayer) == nil or self:GetJoinedActivity(LocalPlayer).leaderId == LocalPlayer:GetId() then return end
 	if Game:GetState() ~= GUIState.Game then return end
 
-	local color = Color(0, 255, 0, 150)
+	local color = GroupActivitiesConfig.LeaderColor
 
 	local leaderPosition = Player.GetById(self:GetJoinedActivity(LocalPlayer).leaderId):GetPosition()
 	if self.leaderPositionTimer:GetMilliseconds() < 1500 then

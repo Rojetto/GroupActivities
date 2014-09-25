@@ -15,7 +15,7 @@ function ChatManagerServer:OnPlayerChat(args)
 
 			if senderActivity ~= nil and receiverActivity ~= nil and senderActivity.id == receiverActivity.id and senderActivity.leaderId == args.player:GetId() then
 				Network:Send(receiver, "ChatIgnore", args.text)
-				Chat:Send(receiver, "[Leader] " .. args.player:GetName() .. ": " .. args.text, Color(153, 102, 204))
+				Chat:Send(receiver, "[Leader] " .. args.player:GetName() .. ": " .. args.text, GroupActivitiesConfig.LeaderColor)
 			end
 		end
 	end

@@ -10,6 +10,9 @@ GroupActivitiesConfig = {
 	--Default: true
 	OpenOnJoin = true,
 
+	--Default: Color(153, 102, 204)
+	LeaderColor = Color(153, 102, 204),
+
 	--Default: true
 	StaffActivityChatFix = true,
 
