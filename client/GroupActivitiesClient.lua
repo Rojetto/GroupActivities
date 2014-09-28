@@ -44,7 +44,9 @@ Leaders have several options to customize their activity. They can
 * restrict the allowed vehicles if they want a themed trip
 * block boosting in vehicles
 * promote a new leader to take over the activity
-* control what happens when they leave the server. Should the activity be automatically deleted or should a random member be promoted to leader?]]
+* control what happens when they leave the server. Should the activity be automatically deleted or should a random member be promoted to leader?
+
+Author: Rojetto]]
 	})
 end
 

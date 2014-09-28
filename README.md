@@ -31,3 +31,5 @@ Open "GroupActivities\shared\Config.lua" to configure the following options:
 * "LeaderColor" changes the color that the arrow that shows to the leader and his chat messages in the activity chat have
 * "StaffActivityChatFix" needs to be activated when you have scripts, that change chat messages by staff members by changing their color or adding a prefix, to prevent staff messages from being sent twice in the activity chat
 * "Staff" is a list of SteamIds of players, that have permission to use the /deleteactivity command
+
+Author: Rojetto
