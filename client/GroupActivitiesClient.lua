@@ -25,15 +25,14 @@ function GroupActivitiesClient:AddHelp()
 		text = "This script adds functionalities for organizing activities in groups.\n\n" ..
 		"Open the activity browser with [" .. GroupActivitiesConfig.ActivityBrowserKeyName .. "]\n\n" ..
 		[[Activities are temporary groups of people that do one specific thing together on the server.
+Examples of activities include: roadtrips, airtrips, boattrips, skydives, races, airshows or just hanging out together.
 
-Creating an activity has several advantages:
+Creating an activity has several advantages:  
 * People that join the server can immediately see what other people are up to and join them if they like
 * Activity leaders don't have to spam the chat with "roadtrip /tpm 178 peaceful"
-* Activity members can always get displayed where the leader is so that they don't get lost
+* Activity members can always see where the leader is so that they don't get lost
 * Activity members can filter the chat so that it only shows chat messages from the activity they're currently in
 * If someone gets lost anyway, they can always teleport to the leader of the activity with one click
-
-Examples of activities include: roadtrips, airtrips, boattrips, skydives, races, airshows or just hanging out together.
 
 Once someone creates an activity they automatically become its leader.
 
@@ -44,7 +43,7 @@ Leaders have several options to customize their activity. They can
 * restrict the allowed vehicles if they want a themed trip
 * block boosting in vehicles
 * promote a new leader to take over the activity
-* control what happens when they leave the server. Should the activity be automatically deleted or should a random member be promoted to leader?
+* control what happens when they leave the activity.
 
 Author: Rojetto]]
 	})
