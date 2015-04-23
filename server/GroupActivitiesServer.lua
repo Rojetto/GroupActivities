@@ -198,7 +198,6 @@ function GroupActivitiesServer:OnTeleportToLeader(playerId)
 
 	if activity ~= nil then
 		local leader = Player.GetById(activity.leaderId)
-		player:SetWorld(leader:GetWorld())
 		player:SetPosition(leader:GetPosition())
 	end
 end
