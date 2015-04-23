@@ -132,7 +132,7 @@ function ActivityBrowser:SetActivities(activityList)
 		row:SetCellText(1, activity.name)
 		row:SetCellText(2, Player.GetById(activity.leaderId):GetName())
 		row:SetCellText(3, activity.access)
-		row:SetCellText(4, tostring(#(activity.memberIds) + 1))
+		row:SetCellText(4, tostring(activity:GetMemberCount()))
 
 		if GroupActivitiesClient:GetJoinedActivity(LocalPlayer) ~= nil and id == GroupActivitiesClient:GetJoinedActivity(LocalPlayer).id then
 			row:SetTextColor(Color(0, 255, 0))
@@ -226,7 +226,7 @@ function ActivityBrowser:ShowDetails(activity)
 		self.nameLabel:SetText("Name: "..activity.name)
 		self.leaderLabel:SetText("Leader: "..Player.GetById(activity.leaderId):GetName())
 		self.accessLabel:SetText("Access: "..activity.access)
-		self.playersLabel:SetText("Players: "..(#(activity.memberIds) + 1))
+		self.playersLabel:SetText("Players: "..(activity:GetMemberCount()))
 		self.boostLabel:SetText("Boost allowed: " .. (activity.boost and "yes" or "no"))
 
 		self.vehiclesButton:SetEnabled(true)

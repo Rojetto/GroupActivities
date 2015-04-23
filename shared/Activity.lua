@@ -173,6 +173,16 @@ function Activity:SetBannedPlayers(banlist)
 	self:AddBannedPlayers(banlist)
 end
 
+function Activity:GetMemberCount()
+	local count = 1
+
+	for _, _ in pairs(self.memberIds) do
+		count = count + 1
+	end
+
+	return count
+end
+
 function Activity:ToTable()
 	local t = {}
 
