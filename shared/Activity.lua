@@ -33,7 +33,7 @@ function Activity:PlayerJoin(player)
 	if not self:IsPlayerInActivity(player) then
 		self.memberIds[player:GetId()] = true
 		Chat:Send(player, 'You have joined "' .. self.name .. '"', Color(0, 255, 0))
-		Chat:Send(player, "You're now talking in the activity chat. Leave the activity to return to global chat.", Color(255, 255, 0))
+		Chat:Send(player, "You are now talking in the activity chat. Leave the activity to return to global chat.", Color(255, 255, 0))
 	end
 end
 
@@ -51,12 +51,12 @@ function Activity:PlayerQuit(player)
 					local key, value = next(self.memberIds)
 					self.leaderId = key
 					self.memberIds[key] = nil
-					Chat:Send(Player.GetById(key), 'You were promoted to the leader of "' .. self.name .. '"', Color(0, 255, 0))
+					Chat:Send(Player.GetById(key), 'You are now the leader of "' .. self.name .. '"', Color(0, 255, 0))
 				end
 			end
 		end
 		Chat:Send(player, 'You have left "' .. self.name .. '"', Color(0, 255, 0))
-		Chat:Send(player, "You're now talking in the global chat.", Color(255, 255, 0))
+		Chat:Send(player, "You are now talking in global chat.", Color(255, 255, 0))
 	end
 end
 
